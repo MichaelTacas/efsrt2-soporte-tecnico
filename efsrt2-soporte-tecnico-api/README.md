@@ -2,17 +2,21 @@
 
 API REST desarrollada para la gestión de solicitudes de soporte técnico.
 
-El sistema permite administrar clientes, técnicos y solicitudes de soporte, aplicando reglas de negocio para la asignación de técnicos, prioridades y cambios de estado.
+El sistema permite administrar clientes, técnicos, usuarios y solicitudes de soporte, aplicando reglas de negocio para la asignación de técnicos, prioridades, cambios de estado, autenticación y autorización por roles.
 
 La información se almacena de forma persistente en una base de datos MySQL mediante Spring Data JPA e Hibernate.
 
+---
+
 ## Integrantes y responsabilidades
 
-| Integrante | Nombre | Responsabilidad |
-|---|---|---|
-| Integrante 1 | Tacas Rocha, Jeymi Michael | Desarrollo de controladores, manejo de excepciones, documentación y pruebas |
-| Integrante 2 | Hernandez Ramirez, Aldair Davis | Desarrollo de modelos y DTO, apoyo en validaciones y pruebas funcionales |
-| Integrante 3 | Rosmery Espinoza Quito | Desarrollo de servicios e implementación de lógica de negocio |
+Michael:
+Análisis / Frontend / Controladores / Seguridad /
+Documentación / Pruebas
+
+Aldair:
+Modelado / DTO / Backend / Servicios /
+Lógica de negocio / Validaciones / Persistencia / QA
 
 ## Tecnologías utilizadas
 
@@ -23,27 +27,38 @@ La información se almacena de forma persistente en una base de datos MySQL medi
 - Hibernate
 - MySQL
 - Jakarta Validation
+- Spring Security
+- JWT
+- BCrypt
+- OAuth2 Resource Server
 - Maven
 - JUnit
 - Swagger / OpenAPI
+- React + TypeScript en el frontend
 
-## Arquitectura
+---
+
+# Arquitectura
 
 El backend se encuentra organizado mediante una arquitectura por capas y separación de responsabilidades.
 
 ```text
+Frontend / Cliente HTTP
+        ↓
+Spring Security / JWT
+        ↓
 Controller
-    ↓
+        ↓
 Application Service
-    ↓
+        ↓
 Service
-    ↓
+        ↓
 Validator
-    ↓
+        ↓
 Repository
-    ↓
+        ↓
 JPA / Hibernate
-    ↓
+        ↓
 MySQL
 ```
 
@@ -53,12 +68,14 @@ Principales paquetes:
 src/main/java/com/idat/soportetecnico
 ├── application
 │   └── impl
+├── config
 ├── controller
 ├── dto
 ├── exception
 ├── mapper
 ├── model
 ├── repository
+├── security
 ├── service
 │   └── impl
 └── validator
@@ -66,15 +83,20 @@ src/main/java/com/idat/soportetecnico
 
 Cada capa cumple una responsabilidad específica:
 
+- **Security:** autentica al usuario y valida sus permisos mediante JWT.
 - **Controller:** recibe las solicitudes HTTP.
 - **Application Service:** coordina los casos de uso.
 - **Service:** contiene la lógica relacionada con cada entidad.
-- **Validator:** aplica reglas de negocio.
+- **Validator:** aplica reglas de negocio específicas.
 - **Repository:** gestiona el acceso a los datos.
 - **JPA / Hibernate:** realiza el mapeo objeto-relacional.
-- **MySQL:** almacena la información de manera persistente.
+- **MySQL:** almacena la información de forma persistente.
 
-## Base de datos
+Esta estructura permite mantener bajo acoplamiento y una mejor separación de responsabilidades.
+
+---
+
+# Base de datos
 
 El proyecto utiliza MySQL.
 
@@ -84,13 +106,13 @@ Nombre de la base de datos:
 soporte_tecnico_db
 ```
 
-El script para crear la base de datos, tablas y datos iniciales se encuentra en la carpeta raíz del proyecto completo:
+El script para crear la base de datos, tablas y datos iniciales se encuentra en:
 
 ```text
 database/setup.sql
 ```
 
-La estructura general es:
+La estructura general del proyecto es:
 
 ```text
 efsrt2-soporte-tecnico
@@ -100,11 +122,32 @@ efsrt2-soporte-tecnico
 └── efsrt2-soporte-tecnico-web
 ```
 
-Antes de ejecutar el sistema se recomienda ejecutar `database/setup.sql` desde MySQL Workbench.
+Entre las principales tablas se encuentran:
 
-## Configuración
+```text
+clientes
+tecnicos
+solicitudes
+usuarios
+```
 
-La conexión a MySQL se configura en:
+La tabla `usuarios` almacena la información utilizada para la autenticación:
+
+```text
+id
+email
+password_hash
+rol
+activo
+```
+
+Las contraseñas no se almacenan en texto plano. Se utiliza BCrypt para generar el hash correspondiente.
+
+---
+
+# Configuración
+
+La configuración principal se encuentra en:
 
 ```text
 src/main/resources/application.properties
@@ -112,16 +155,10 @@ src/main/resources/application.properties
 
 La contraseña de MySQL no se almacena directamente en el repositorio.
 
-Se utiliza la variable de entorno:
+Se utiliza:
 
 ```text
 DB_PASSWORD
-```
-
-Ejemplo en PowerShell:
-
-```powershell
-$env:DB_PASSWORD="root"
 ```
 
 El usuario de MySQL puede configurarse mediante:
@@ -130,474 +167,140 @@ El usuario de MySQL puede configurarse mediante:
 DB_USER
 ```
 
-Si no se define, se utiliza `root` como valor predeterminado.
+Si no se define, se utiliza `root`.
 
-## Validaciones
-
-El proyecto utiliza Jakarta Validation para validar los datos recibidos por la API.
-
-Entre las anotaciones utilizadas se encuentran:
+También se utilizan variables de entorno para JWT y para el administrador inicial:
 
 ```text
-@Valid
-@NotBlank
-@NotNull
-@Size
-@Email
-@Positive
+JWT_SECRET
+JWT_ISSUER
+JWT_EXPIRATION_SECONDS
+
+ADMIN_EMAIL
+ADMIN_PASSWORD
 ```
 
-Cuando una petición contiene datos inválidos, la API puede responder con:
+---
 
-```text
-400 Bad Request
-```
+## Ejemplo de configuración en PowerShell
 
-## Manejo de errores
-
-El proyecto cuenta con un manejador global de excepciones mediante:
-
-```text
-GlobalExceptionHandler
-```
-
-utilizando:
-
-```text
-@RestControllerAdvice
-```
-
-Los principales códigos manejados son:
-
-```text
-400 Bad Request → datos inválidos o incumplimiento de una regla de negocio
-404 Not Found   → recurso solicitado no encontrado
-```
-
-También se utilizan excepciones personalizadas como:
-
-```text
-RecursoNoEncontradoException
-ReglaNegocioException
-```
-
-Esto permite centralizar el manejo de errores y evitar repetir esta lógica dentro de los controladores.
-
-## Funcionalidades principales
-
-### Clientes
-
-El backend permite:
-
-- Registrar clientes.
-- Listar clientes.
-- Buscar clientes por ID.
-- Actualizar clientes.
-- Eliminar clientes.
-
-### Técnicos
-
-El backend permite:
-
-- Registrar técnicos.
-- Listar técnicos.
-- Buscar técnicos por ID.
-- Actualizar técnicos.
-- Eliminar técnicos.
-- Consultar técnicos disponibles.
-
-### Solicitudes
-
-El backend permite:
-
-- Registrar solicitudes.
-- Listar solicitudes.
-- Buscar solicitudes por ID.
-- Actualizar solicitudes.
-- Eliminar solicitudes.
-- Consultar solicitudes por prioridad.
-- Consultar solicitudes por estado.
-- Asignar técnicos.
-- Cambiar el estado de una solicitud.
-
-## Endpoints principales
-
-### Solicitudes
-
-```text
-POST   /api/solicitudes
-GET    /api/solicitudes
-GET    /api/solicitudes/{id}
-PUT    /api/solicitudes/{id}
-DELETE /api/solicitudes/{id}
-
-GET    /api/solicitudes/estado/{estado}
-GET    /api/solicitudes/prioridad/{prioridad}
-```
-
-Los controladores de clientes y técnicos proporcionan operaciones CRUD equivalentes para sus respectivas entidades.
-
-## Ejemplo de registro de una solicitud
-
-### Petición
-
-```http
-POST /api/solicitudes
-```
-
-```json
-{
-  "titulo": "Problema con Outlook",
-  "descripcion": "El usuario no puede ingresar a su correo corporativo",
-  "prioridad": "ALTA",
-  "clienteId": 1,
-  "tecnicoId": 1
-}
-```
-
-### Respuesta esperada
-
-```json
-{
-  "id": 1,
-  "titulo": "Problema con Outlook",
-  "descripcion": "El usuario no puede ingresar a su correo corporativo",
-  "prioridad": "ALTA",
-  "estado": "PENDIENTE",
-  "clienteId": 1,
-  "clienteNombre": "Juan Cruz",
-  "tecnicoId": 1,
-  "tecnicoNombre": "Carlos Mendoza"
-}
-```
-
-Código esperado:
-
-```text
-201 Created
-```
-
-## Reglas de negocio
-
-Al registrar una nueva solicitud, el sistema utiliza inicialmente el estado:
-
-```text
-PENDIENTE
-```
-
-El flujo permitido es:
-
-```text
-PENDIENTE
-    ↓
-EN_PROCESO
-    ↓
-RESUELTA
-    ↓
-CERRADA
-```
-
-### Validación de transiciones
-
-La clase:
-
-```text
-TransicionEstadoValidator
-```
-
-se encarga de verificar que una solicitud no cambie directamente hacia un estado que no corresponda.
-
-Ejemplo permitido:
-
-```text
-PENDIENTE → EN_PROCESO
-```
-
-Ejemplo rechazado:
-
-```text
-PENDIENTE → CERRADA
-```
-
-### Validación de técnicos
-
-La clase:
-
-```text
-TecnicoDisponibleValidator
-```
-
-verifica que un técnico se encuentre disponible antes de ser asignado a una solicitud.
-
-También se permite registrar una solicitud sin técnico asignado cuando corresponda.
-
-## Swagger / OpenAPI
-
-La API cuenta con documentación interactiva mediante Swagger.
-
-Con el backend iniciado se puede acceder a:
-
-```text
-http://localhost:8080/swagger-ui/index.html
-```
-
-La especificación OpenAPI se encuentra disponible en:
-
-```text
-http://localhost:8080/v3/api-docs
-```
-
-Swagger permite consultar y probar los endpoints REST directamente desde el navegador.
-
-## Ejecución del proyecto
-
-### Requisitos
-
-Se necesita:
-
-- Java 21.
-- Maven o Maven Wrapper.
-- MySQL.
-- IntelliJ IDEA, Eclipse, VS Code u otro IDE compatible.
-
-### Ejecutar en Windows
-
-Desde:
-
-```text
-efsrt2-soporte-tecnico-api
-```
-
-configurar la contraseña de MySQL:
+### Base de datos
 
 ```powershell
-$env:DB_PASSWORD="root"
+$env:DB_PASSWORD="TU_CONTRASEÑA_MYSQL"
 ```
 
-Luego ejecutar:
+### Generar una clave JWT segura para desarrollo
 
 ```powershell
-.\mvnw.cmd spring-boot:run
+$bytes = New-Object byte[] 32
+$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+$rng.GetBytes($bytes)
+$env:JWT_SECRET = [Convert]::ToBase64String($bytes)
+$rng.Dispose()
 ```
 
-### Ejecutar en Linux o macOS
-
-```bash
-export DB_PASSWORD="TU_CONTRASEÑA"
-./mvnw spring-boot:run
-```
-
-La API se ejecuta por defecto en:
-
-```text
-http://localhost:8080
-```
-
-## Pruebas automatizadas
-
-El backend cuenta con pruebas automatizadas desarrolladas con JUnit.
-
-Actualmente se ejecutan **8 pruebas**:
-
-- 1 prueba de carga del contexto de Spring Boot.
-- 3 pruebas relacionadas con la disponibilidad de técnicos.
-- 4 pruebas relacionadas con las transiciones de estado de las solicitudes.
-
-### TecnicoDisponibleValidatorTest
-
-Comprueba reglas como:
-
-```text
-Técnico disponible
-→ permite registrar la solicitud
-
-Técnico no disponible
-→ lanza ReglaNegocioException
-
-Solicitud sin técnico
-→ permite registrar la solicitud
-```
-
-### TransicionEstadoValidatorTest
-
-Comprueba las siguientes transiciones:
-
-```text
-PENDIENTE → EN_PROCESO ✅
-EN_PROCESO → RESUELTA ✅
-RESUELTA → CERRADA ✅
-PENDIENTE → CERRADA ❌
-```
-
-Las pruebas pueden ejecutarse mediante:
+### Administrador inicial
 
 ```powershell
-.\mvnw.cmd test
+$env:ADMIN_EMAIL="admin@grzasociados.com"
+$env:ADMIN_PASSWORD="TU_CONTRASEÑA_DE_DESARROLLO"
 ```
 
-Resultado verificado:
+Las contraseñas y secretos reales no deben almacenarse directamente en GitHub.
 
-```text
-Tests run: 8
-Failures: 0
-Errors: 0
-Skipped: 0
+---
 
-BUILD SUCCESS
-```
+# Seguridad
 
-Estas pruebas permiten comprobar automáticamente que las principales reglas de negocio continúan funcionando después de realizar cambios en el sistema.
+El sistema implementa autenticación y autorización mediante Spring Security y JWT.
 
-## Pruebas funcionales
-
-Además de las pruebas unitarias, durante el desarrollo se realizaron pruebas funcionales utilizando:
-
-- Swagger UI.
-- Postman.
-- Navegador web mediante la integración con el frontend.
-
-Se verificaron operaciones como:
-
-- Registro de clientes.
-- Registro de técnicos.
-- Registro de solicitudes.
-- Consultas.
-- Actualizaciones.
-- Eliminaciones.
-- Validaciones.
-- Cambio de estados.
-- Consulta por prioridad.
-- Consulta por estado.
-- Consulta de técnicos disponibles.
-- Manejo de errores.
-
-## Principios de diseño
-
-El proyecto utiliza separación de responsabilidades y principios SOLID para evitar concentrar toda la lógica en una sola clase.
-
-El flujo principal del backend es:
-
-```text
-Cliente HTTP / Frontend
-        ↓
-Controller
-        ↓
-Application Service
-        ↓
-Service
-        ↓
-Validator
-        ↓
-Repository
-        ↓
-JPA / Hibernate
-        ↓
-MySQL
-```
-
-Algunos ejemplos de separación de responsabilidades son:
-
-```text
-SolicitudController
-→ atiende las peticiones HTTP
-
-SolicitudApplicationService
-→ coordina el caso de uso
-
-SolicitudService
-→ ejecuta operaciones de negocio
-
-Validators
-→ verifican reglas específicas
-
-SolicitudRepository
-→ gestiona la persistencia
-
-SolicitudMapper
-→ transforma entidades y DTO
-```
-
-Esta estructura permite mantener un bajo acoplamiento y facilita la ampliación y mantenimiento del sistema.
-
-## Seguridad
-
-Actualmente la API no implementa un sistema completo de autenticación y autorización.
-
-Como mejora futura se propone incorporar:
+La seguridad actualmente incluye:
 
 - Spring Security.
 - Autenticación mediante JWT.
-- Roles y permisos.
-- BCrypt para el almacenamiento seguro de contraseñas.
+- Tokens Bearer.
+- Sesiones stateless.
+- BCrypt para contraseñas.
+- Roles `ADMINISTRADOR` y `TECNICO`.
+- Control de acceso según endpoint.
+- Validación de permisos para cambios de estado.
+- Protección de endpoints administrativos.
+- Swagger configurado para autenticación Bearer.
 
-Las credenciales locales de MySQL no se almacenan directamente en el código fuente y se configuran mediante variables de entorno.
-
-## Frontend
-
-El frontend se encuentra desarrollado utilizando:
-
-- React.
-- TypeScript.
-- Vite.
-
-Se encuentra dentro del mismo proyecto general:
-
-```text
-efsrt2-soporte-tecnico-web
-```
-
-El frontend consume los endpoints REST proporcionados por este backend.
-
-El flujo completo es:
+El flujo de autenticación es:
 
 ```text
 Usuario
    ↓
-React + TypeScript
+POST /api/auth/login
    ↓
-API REST Spring Boot
+Validación de correo y contraseña
    ↓
-Lógica de negocio
+BCrypt
    ↓
-JPA / Hibernate
+Generación de JWT
    ↓
-MySQL
+JWT + rol del usuario
+   ↓
+Frontend
+   ↓
+Authorization: Bearer <token>
+   ↓
+Spring Security
+   ↓
+Endpoint autorizado
 ```
 
-## Repositorio
+---
 
-El backend forma parte del repositorio general del proyecto:
+# Roles del sistema
+
+## ADMINISTRADOR
+
+El administrador puede:
+
+- Iniciar sesión.
+- Registrar solicitudes.
+- Consultar solicitudes.
+- Administrar usuarios.
+- Registrar clientes.
+- Modificar clientes.
+- Eliminar clientes.
+- Registrar técnicos.
+- Modificar técnicos.
+- Eliminar técnicos.
+- Cerrar solicitudes resueltas.
+- Acceder a funciones administrativas.
+
+## TECNICO
+
+El técnico puede:
+
+- Iniciar sesión.
+- Consultar solicitudes.
+- Iniciar la atención de solicitudes.
+- Cambiar una solicitud de `PENDIENTE` a `EN_PROCESO`.
+- Cambiar una solicitud de `EN_PROCESO` a `RESUELTA`.
+- Consultar información necesaria para realizar la atención.
+
+El técnico no puede:
+
+- Registrar nuevas solicitudes.
+- Administrar usuarios.
+- Crear, modificar o eliminar clientes.
+- Crear, modificar o eliminar técnicos.
+- Eliminar solicitudes.
+- Cerrar definitivamente una solicitud resuelta.
+
+---
+
+# Autenticación
+
+## Endpoint de login
 
 ```text
-https://github.com/MichaelTacas/efsrt2-soporte-tecnico
+POST /api/auth/login
 ```
 
-Dentro del repositorio se encuentran:
-
-```text
-database/
-efsrt2-soporte-tecnico-api/
-efsrt2-soporte-tecnico-web/
-```
-
-Esto permite mantener en un mismo repositorio la capa de datos, la lógica de negocio y la vista.
-
-## Resultado
-
-El proyecto implementa un sistema web funcional para la gestión de solicitudes de soporte técnico.
-
-La solución integra:
-
-- Frontend desarrollado con React y TypeScript.
-- API REST desarrollada con Spring Boot.
-- Arquitectura por capas.
-- Persistencia mediante MySQL.
-- Spring Data JPA e Hibernate.
-- Operaciones CRUD.
-- Validaciones.
-- Reglas de negocio.
-- Manejo centralizado de excepciones.
-- Documentación con Swagger.
-- Pruebas funcionales.
-- 8 pruebas automatizadas con JUnit.
-- Integración entre las capas de vista, negocio y datos.
+Ejemplo

@@ -9,5 +9,4 @@ public class SoporteTecnicoApiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SoporteTecnicoApiApplication.class, args);
 	}
-
 }

@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> respuesta = new HashMap<>();
 
         respuesta.put("fecha", LocalDateTime.now());
-        respuesta.put("estado", 404);
+        respuesta.put("estado", HttpStatus.NOT_FOUND.value());
         respuesta.put("error", "Not Found");
         respuesta.put("mensaje", exception.getMessage());
 
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> respuesta = new HashMap<>();
 
         respuesta.put("fecha", LocalDateTime.now());
-        respuesta.put("estado", 400);
+        respuesta.put("estado", HttpStatus.BAD_REQUEST.value());
         respuesta.put("error", "Bad Request");
         respuesta.put("mensaje", exception.getMessage());
 
@@ -63,5 +63,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(errores);
+    }
+
+    @ExceptionHandler(AutenticacionException.class)
+    public ResponseEntity<Map<String, Object>> manejarAutenticacion(
+            AutenticacionException exception) {
+
+        Map<String, Object> respuesta = new HashMap<>();
+
+        respuesta.put("fecha", LocalDateTime.now());
+        respuesta.put("estado", HttpStatus.UNAUTHORIZED.value());
+        respuesta.put("error", "Unauthorized");
+        respuesta.put("mensaje", exception.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(respuesta);
     }
 }

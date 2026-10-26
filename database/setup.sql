@@ -50,6 +50,17 @@ CREATE TABLE IF NOT EXISTS solicitudes (
     REFERENCES tecnicos(id)
     );
 
+-- =========================================
+-- TABLA USUARIOS
+-- =========================================
+
+CREATE TABLE IF NOT EXISTS usuarios (
+                                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                        email VARCHAR(150) NOT NULL UNIQUE,
+    password_hash VARCHAR(100) NOT NULL,
+    rol VARCHAR(30) NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE
+    );
 
 -- =========================================
 -- DATOS DE EJEMPLO
@@ -89,3 +100,4 @@ SELECT 'Luis Torres', 'Soporte de Software', TRUE
     FROM tecnicos
     WHERE nombre = 'Luis Torres'
 );
+
