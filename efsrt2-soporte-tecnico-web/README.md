@@ -2,7 +2,7 @@
 
 Frontend web desarrollado para la gestión de solicitudes de soporte técnico.
 
-La aplicación permite registrar solicitudes, seleccionar clientes y técnicos disponibles, consultar las solicitudes registradas y actualizar su estado mediante una interfaz web conectada con la API REST desarrollada en Spring Boot.
+La aplicación permite registrar solicitudes, seleccionar clientes y técnicos disponibles, consultar las solicitudes registradas y actualizar su estado mediante una interfaz web conectada con una API REST desarrollada en Spring Boot.
 
 ## Tecnologías utilizadas
 
@@ -18,18 +18,18 @@ La aplicación permite registrar solicitudes, seleccionar clientes y técnicos d
 Actualmente el frontend permite:
 
 - Registrar nuevas solicitudes de soporte.
-- Ingresar título y descripción del problema.
+- Ingresar el título y descripción del problema.
 - Seleccionar la prioridad de la solicitud:
-    - BAJA
-    - MEDIA
-    - ALTA
+  - BAJA
+  - MEDIA
+  - ALTA
 - Seleccionar un cliente registrado.
 - Consultar y seleccionar técnicos disponibles.
 - Registrar solicitudes sin técnico asignado.
 - Listar las solicitudes existentes.
 - Mostrar información del cliente y técnico asociado.
 - Visualizar la prioridad y estado de cada solicitud.
-- Cambiar el estado de las solicitudes.
+- Actualizar el estado de las solicitudes.
 - Mostrar mensajes de éxito o error durante las operaciones.
 
 ## Estados de las solicitudes
@@ -62,7 +62,7 @@ CERRADA
 → Finalizada
 ```
 
-Las reglas definitivas para permitir o rechazar una transición se validan en el backend.
+Las reglas de negocio que permiten o rechazan las transiciones de estado se validan en el backend.
 
 ## Estructura principal
 
@@ -103,17 +103,17 @@ Es la pantalla principal del sistema.
 
 Se encarga de:
 
-- Cargar las solicitudes.
-- Mostrar el formulario.
+- Cargar las solicitudes registradas.
+- Mostrar el formulario de registro.
 - Mostrar el listado de solicitudes.
 - Coordinar el registro de nuevas solicitudes.
-- Coordinar el cambio de estado.
+- Coordinar la actualización del estado.
 
 ### SolicitudForm
 
-Componente responsable de capturar los datos para registrar una nueva solicitud.
+Componente responsable de capturar los datos necesarios para registrar una nueva solicitud.
 
-Permite seleccionar:
+Permite ingresar o seleccionar:
 
 - Título.
 - Descripción.
@@ -123,13 +123,15 @@ Permite seleccionar:
 
 ### SolicitudEstadoAction
 
-Componente responsable de mostrar la acción disponible según el estado actual de una solicitud.
+Componente responsable de mostrar la acción disponible de acuerdo con el estado actual de una solicitud.
 
 Ejemplo:
 
 ```text
+PENDIENTE → Iniciar atención
 EN_PROCESO → Marcar resuelta
 RESUELTA → Cerrar
+CERRADA → Finalizada
 ```
 
 ## Servicios
@@ -140,7 +142,7 @@ La comunicación con el backend se encuentra separada de los componentes visuale
 
 Centraliza las operaciones HTTP utilizadas por la aplicación.
 
-Actualmente soporta:
+Actualmente permite trabajar con operaciones como:
 
 ```text
 GET
@@ -150,28 +152,28 @@ PUT
 
 ### solicitudService.ts
 
-Gestiona las operaciones relacionadas con solicitudes.
+Gestiona las operaciones relacionadas con las solicitudes de soporte.
 
 ### clienteService.ts
 
-Obtiene los clientes registrados desde el backend.
+Obtiene desde el backend la información de los clientes registrados.
 
 ### tecnicoService.ts
 
-Obtiene los técnicos disponibles desde el backend.
+Obtiene desde el backend los técnicos disponibles para ser asignados a una solicitud.
 
-Esta separación permite mantener un menor acoplamiento entre la interfaz y la comunicación con la API.
+Esta separación ayuda a reducir el acoplamiento entre la interfaz y la comunicación con la API.
 
 ## Integración con el backend
 
 El frontend consume una API REST desarrollada con Spring Boot.
 
-El flujo general es:
+El flujo general del sistema es:
 
 ```text
 Usuario
    ↓
-React
+React + TypeScript
    ↓
 Services
    ↓
@@ -181,22 +183,24 @@ API REST Spring Boot
    ↓
 Lógica de negocio
    ↓
-Repository
+Repository / JPA
    ↓
 MySQL
 ```
 
-El backend se ejecuta en:
+El backend se ejecuta normalmente en:
 
 ```text
 http://localhost:8080
 ```
 
-El frontend se ejecuta por defecto en:
+El frontend se ejecuta normalmente en:
 
 ```text
 http://localhost:5173
 ```
+
+Si el puerto `5173` se encuentra ocupado, Vite puede utilizar otro puerto disponible.
 
 ## Proxy de desarrollo
 
@@ -212,20 +216,23 @@ hacia el backend:
 http://localhost:8080
 ```
 
-Por ejemplo:
+Ejemplo:
 
 ```text
-Frontend:
+Frontend
 GET /api/solicitudes
 
-Vite Proxy:
-↓
+        ↓
 
-Backend:
+Vite Proxy
+
+        ↓
+
+Backend
 http://localhost:8080/api/solicitudes
 ```
 
-Esto evita colocar directamente la URL completa del backend dentro de cada servicio.
+Esto permite centralizar la comunicación con el backend y evita colocar la URL completa de la API en cada componente.
 
 ## Requisitos
 
@@ -268,7 +275,7 @@ Abrir esa dirección en el navegador.
 
 ## Ejecución completa del sistema
 
-Para utilizar correctamente el frontend se deben tener activos los tres componentes:
+Para utilizar correctamente la aplicación se deben tener activos los tres componentes principales:
 
 ```text
 MySQL
@@ -278,21 +285,47 @@ Spring Boot :8080
 React / Vite :5173
 ```
 
-1. Ejecutar el script de base de datos ubicado en:
+### 1. Preparar la base de datos
+
+Desde la carpeta raíz del proyecto se encuentra el script:
 
 ```text
 database/setup.sql
 ```
 
-2. Iniciar el backend Spring Boot.
+Este script permite preparar la base de datos utilizada por el sistema.
 
-3. Iniciar el frontend:
+### 2. Iniciar el backend
+
+Ejecutar la aplicación Spring Boot ubicada en:
+
+```text
+efsrt2-soporte-tecnico-api
+```
+
+El backend deberá estar disponible en:
+
+```text
+http://localhost:8080
+```
+
+### 3. Iniciar el frontend
+
+Desde:
+
+```text
+efsrt2-soporte-tecnico-web
+```
+
+ejecutar:
 
 ```powershell
 npm run dev
 ```
 
-4. Abrir:
+### 4. Abrir la aplicación
+
+Ingresar desde el navegador a la dirección mostrada por Vite, normalmente:
 
 ```text
 http://localhost:5173/
@@ -300,7 +333,7 @@ http://localhost:5173/
 
 ## Diseño de la interfaz
 
-La interfaz utiliza un diseño oscuro y responsive.
+La interfaz utiliza un diseño oscuro y adaptable a diferentes tamaños de pantalla.
 
 Se priorizó:
 
@@ -308,35 +341,36 @@ Se priorizó:
 - Separación entre formulario y listado.
 - Campos correctamente identificados.
 - Uso de listas desplegables para clientes y técnicos.
-- Visualización diferenciada de prioridad y estado.
-- Adaptación a diferentes tamaños de pantalla.
+- Visualización clara de la prioridad y estado.
+- Acciones específicas según el estado de cada solicitud.
+- Adaptación de la interfaz a diferentes resoluciones.
 
 ## Principios aplicados
 
-Durante el desarrollo se buscó mantener responsabilidades separadas.
-
-Ejemplo:
+Durante el desarrollo del frontend se buscó mantener responsabilidades separadas entre los diferentes componentes.
 
 ```text
 SolicitudForm
-→ captura información
+→ captura y envía los datos del formulario
 
 SolicitudEstadoAction
-→ controla la acción visual de estado
+→ muestra las acciones relacionadas con el estado
 
 SolicitudesPage
-→ coordina la pantalla
+→ coordina la pantalla principal
 
 Services
-→ manejan operaciones del dominio
+→ encapsulan las operaciones relacionadas con la API
 
 apiClient
-→ maneja comunicación HTTP
+→ centraliza la comunicación HTTP
 ```
 
-Esto facilita el mantenimiento del frontend y evita colocar toda la lógica en un único componente.
+Esta organización facilita el mantenimiento del código y evita concentrar toda la lógica de la aplicación en un único componente.
 
-## Backend relacionado
+También permite realizar cambios en una parte del sistema sin afectar innecesariamente a las demás.
+
+## Relación con el proyecto completo
 
 Este frontend forma parte del proyecto:
 
@@ -344,10 +378,29 @@ Este frontend forma parte del proyecto:
 efsrt2-soporte-tecnico
 ```
 
-y trabaja en conjunto con:
+y trabaja en conjunto con el backend:
 
 ```text
 efsrt2-soporte-tecnico-api
 ```
 
-La persistencia de los datos se realiza mediante MySQL desde el backend.
+La persistencia de la información se realiza en MySQL a través del backend.
+
+La arquitectura general utilizada es:
+
+```text
+Vista
+React + TypeScript
+        ↓
+API / Controller
+Spring Boot
+        ↓
+Lógica de negocio
+Services + Validators
+        ↓
+Acceso a datos
+Repository + JPA / Hibernate
+        ↓
+Base de datos
+MySQL
+```
