@@ -7,7 +7,8 @@ El sistema permite gestionar solicitudes de soporte técnico mediante una aplica
 ## Integrantes
 
 - Michael Jeymi Tacas Rocha
-- 2da persona
+- Aldair Davis Hernandez Ramirez
+- Rosmery Espinoza Quito
 
 ## Organización de referencia
 
@@ -185,7 +186,7 @@ Las pruebas del backend pueden ejecutarse con:
 Resultado verificado:
 
 ```text
-Tests run: 1
+Tests run: 8
 Failures: 0
 Errors: 0
 Skipped: 0
@@ -193,7 +194,7 @@ Skipped: 0
 BUILD SUCCESS
 ```
 
-Actualmente se cuenta con la prueba de carga del contexto de Spring Boot. Como mejora futura se incorporarán pruebas unitarias específicas para servicios y validadores.
+La suite incluye 1 prueba de carga del contexto de Spring Boot, 3 pruebas de `TecnicoDisponibleValidator` y 4 pruebas de `TransicionEstadoValidator`. Como mejora futura se ampliará la cobertura hacia servicios (JUnit/Mockito) y pruebas de integración.
 
 ## Seguridad
 
