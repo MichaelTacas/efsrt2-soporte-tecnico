@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import com.idat.soportetecnico.model.EstadoSolicitud;
+import com.idat.soportetecnico.model.GravedadIncidencia;
 
 public class SolicitudRequest {
 
@@ -19,6 +20,9 @@ public class SolicitudRequest {
 
     @NotNull(message = "La prioridad es obligatoria")
     private Prioridad prioridad;
+
+    @NotNull(message = "La gravedad es obligatoria")
+    private GravedadIncidencia gravedad;
 
     @NotNull(message = "El cliente es obligatorio")
     @Positive(message = "El ID del cliente debe ser mayor a cero")
@@ -90,6 +94,14 @@ public class SolicitudRequest {
 
     public void setEstado(EstadoSolicitud estado) {
         this.estado = estado;
+    }
+
+    public GravedadIncidencia getGravedad() {
+        return gravedad;
+    }
+
+    public void setGravedad(GravedadIncidencia gravedad) {
+        this.gravedad = gravedad;
     }
 
 }

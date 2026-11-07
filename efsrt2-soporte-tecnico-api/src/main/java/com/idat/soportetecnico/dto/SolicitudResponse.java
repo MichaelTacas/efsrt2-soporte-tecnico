@@ -2,6 +2,9 @@ package com.idat.soportetecnico.dto;
 
 import com.idat.soportetecnico.model.EstadoSolicitud;
 import com.idat.soportetecnico.model.Prioridad;
+import com.idat.soportetecnico.model.GravedadIncidencia;
+
+import java.time.LocalDateTime;
 
 public class SolicitudResponse {
 
@@ -16,6 +19,17 @@ public class SolicitudResponse {
 
     private Long tecnicoId;
     private String tecnicoNombre;
+    private GravedadIncidencia gravedad;
+
+    private LocalDateTime fechaCreacion;
+
+    private LocalDateTime fechaLimite;
+
+    private LocalDateTime fechaInicioAtencion;
+
+    private LocalDateTime fechaResolucion;
+
+    private LocalDateTime fechaCierre;
 
     public SolicitudResponse() {
     }
@@ -111,5 +125,52 @@ public class SolicitudResponse {
 
     public void setTecnicoNombre(String tecnicoNombre) {
         this.tecnicoNombre = tecnicoNombre;
+    }
+    public GravedadIncidencia getGravedad() {
+        return gravedad;
+    }
+
+    public void setGravedad(GravedadIncidencia gravedad) {
+        this.gravedad = gravedad;
+    }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public LocalDateTime getFechaLimite() {
+        return fechaLimite;
+    }
+
+    public void setFechaLimite(LocalDateTime fechaLimite) {
+        this.fechaLimite = fechaLimite;
+    }
+
+    public LocalDateTime getFechaInicioAtencion() {
+        return fechaInicioAtencion;
+    }
+
+    public void setFechaInicioAtencion(LocalDateTime fechaInicioAtencion) {
+        this.fechaInicioAtencion = fechaInicioAtencion;
+    }
+
+    public LocalDateTime getFechaResolucion() {
+        return fechaResolucion;
+    }
+
+    public void setFechaResolucion(LocalDateTime fechaResolucion) {
+        this.fechaResolucion = fechaResolucion;
+    }
+
+    public LocalDateTime getFechaCierre() {
+        return fechaCierre;
+    }
+
+    public void setFechaCierre(LocalDateTime fechaCierre) {
+        this.fechaCierre = fechaCierre;
     }
 }

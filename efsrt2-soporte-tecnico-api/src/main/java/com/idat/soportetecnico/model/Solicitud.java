@@ -12,6 +12,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "solicitudes")
 public class Solicitud {
@@ -41,6 +43,21 @@ public class Solicitud {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tecnico_id")
     private Tecnico tecnico;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private GravedadIncidencia gravedad;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime fechaCreacion;
+
+    private LocalDateTime fechaResolucion;
+
+    private LocalDateTime fechaCierre;
+
+    private LocalDateTime fechaLimite;
+
+    private LocalDateTime fechaInicioAtencion;
 
     public Solicitud() {
     }
@@ -99,5 +116,53 @@ public class Solicitud {
 
     public void setTecnico(Tecnico tecnico) {
         this.tecnico = tecnico;
+    }
+
+    public GravedadIncidencia getGravedad() {
+        return gravedad;
+    }
+
+    public void setGravedad(GravedadIncidencia gravedad) {
+        this.gravedad = gravedad;
+    }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public LocalDateTime getFechaResolucion() {
+        return fechaResolucion;
+    }
+
+    public void setFechaResolucion(LocalDateTime fechaResolucion) {
+        this.fechaResolucion = fechaResolucion;
+    }
+
+    public LocalDateTime getFechaCierre() {
+        return fechaCierre;
+    }
+
+    public void setFechaCierre(LocalDateTime fechaCierre) {
+        this.fechaCierre = fechaCierre;
+    }
+
+    public LocalDateTime getFechaLimite() {
+        return fechaLimite;
+    }
+
+    public void setFechaLimite(LocalDateTime fechaLimite) {
+        this.fechaLimite = fechaLimite;
+    }
+
+    public LocalDateTime getFechaInicioAtencion() {
+        return fechaInicioAtencion;
+    }
+
+    public void setFechaInicioAtencion(LocalDateTime fechaInicioAtencion) {
+        this.fechaInicioAtencion = fechaInicioAtencion;
     }
 }

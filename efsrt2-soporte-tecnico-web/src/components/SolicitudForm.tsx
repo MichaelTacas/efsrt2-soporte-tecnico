@@ -20,14 +20,26 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
     const [prioridad, setPrioridad] =
         useState<"BAJA" | "MEDIA" | "ALTA">("MEDIA");
 
+    const [gravedad, setGravedad] =
+        useState<"LEVE" | "MODERADA" | "GRAVE" | "CRITICA">(
+            "MODERADA"
+        );
+
     const [clienteId, setClienteId] = useState<number>(0);
-    const [tecnicoId, setTecnicoId] = useState<number | null>(null);
+    const [tecnicoId, setTecnicoId] =
+        useState<number | null>(null);
 
-    const [clientes, setClientes] = useState<Cliente[]>([]);
-    const [tecnicos, setTecnicos] = useState<Tecnico[]>([]);
+    const [clientes, setClientes] =
+        useState<Cliente[]>([]);
 
-    const [enviando, setEnviando] = useState(false);
-    const [mensaje, setMensaje] = useState("");
+    const [tecnicos, setTecnicos] =
+        useState<Tecnico[]>([]);
+
+    const [enviando, setEnviando] =
+        useState(false);
+
+    const [mensaje, setMensaje] =
+        useState("");
 
     useEffect(() => {
 
@@ -45,6 +57,7 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
                 setTecnicos(tecnicosData);
 
             } catch {
+
                 setMensaje(
                     "No se pudieron cargar los clientes o técnicos"
                 );
@@ -62,7 +75,9 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
         event.preventDefault();
 
         if (clienteId === 0) {
-            setMensaje("Debe seleccionar un cliente");
+            setMensaje(
+                "Debe seleccionar un cliente"
+            );
             return;
         }
 
@@ -70,6 +85,7 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
             titulo,
             descripcion,
             prioridad,
+            gravedad,
             clienteId,
             tecnicoId
         };
@@ -84,20 +100,29 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
             setTitulo("");
             setDescripcion("");
             setPrioridad("MEDIA");
+            setGravedad("MODERADA");
             setClienteId(0);
             setTecnicoId(null);
 
-            setMensaje("Solicitud registrada correctamente");
+            setMensaje(
+                "Solicitud registrada correctamente"
+            );
 
         } catch (error) {
 
             if (error instanceof Error) {
+
                 setMensaje(error.message);
+
             } else {
-                setMensaje("No se pudo registrar la solicitud");
+
+                setMensaje(
+                    "No se pudo registrar la solicitud"
+                );
             }
 
         } finally {
+
             setEnviando(false);
         }
     };
@@ -106,13 +131,20 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
         <section className="form-card">
 
             <div className="form-header">
+
                 <div>
-                    <h2>Registrar nueva solicitud</h2>
+
+                    <h2>
+                        Registrar nueva solicitud
+                    </h2>
 
                     <p>
-                        Complete los datos para generar una nueva solicitud de soporte.
+                        Complete los datos para generar
+                        una nueva solicitud de soporte.
                     </p>
+
                 </div>
+
             </div>
 
             <form
@@ -120,9 +152,11 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
                 onSubmit={handleSubmit}
             >
 
+                {/* INCIDENTE */}
                 <div className="form-group">
+
                     <label htmlFor="titulo">
-                        Título
+                        Incidente
                     </label>
 
                     <input
@@ -130,14 +164,19 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
                         type="text"
                         value={titulo}
                         onChange={(event) =>
-                            setTitulo(event.target.value)
+                            setTitulo(
+                                event.target.value
+                            )
                         }
-                        placeholder="Ej. Problema con impresora"
+                        placeholder="Ej. Equipo sin conexión a Internet"
                         required
                     />
+
                 </div>
 
+                {/* PRIORIDAD */}
                 <div className="form-group">
+
                     <label htmlFor="prioridad">
                         Prioridad
                     </label>
@@ -148,17 +187,32 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
                         onChange={(event) =>
                             setPrioridad(
                                 event.target.value as
-                                    "BAJA" | "MEDIA" | "ALTA"
+                                    | "BAJA"
+                                    | "MEDIA"
+                                    | "ALTA"
                             )
                         }
                     >
-                        <option value="BAJA">Baja</option>
-                        <option value="MEDIA">Media</option>
-                        <option value="ALTA">Alta</option>
+
+                        <option value="BAJA">
+                            Baja
+                        </option>
+
+                        <option value="MEDIA">
+                            Media
+                        </option>
+
+                        <option value="ALTA">
+                            Alta
+                        </option>
+
                     </select>
+
                 </div>
 
+                {/* DESCRIPCIÓN */}
                 <div className="form-group form-group-full">
+
                     <label htmlFor="descripcion">
                         Descripción
                     </label>
@@ -167,14 +221,60 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
                         id="descripcion"
                         value={descripcion}
                         onChange={(event) =>
-                            setDescripcion(event.target.value)
+                            setDescripcion(
+                                event.target.value
+                            )
                         }
                         placeholder="Describe detalladamente el problema presentado..."
                         required
                     />
+
                 </div>
 
+                {/* GRAVEDAD */}
                 <div className="form-group">
+
+                    <label htmlFor="gravedad">
+                        Gravedad
+                    </label>
+
+                    <select
+                        id="gravedad"
+                        value={gravedad}
+                        onChange={(event) =>
+                            setGravedad(
+                                event.target.value as
+                                    | "LEVE"
+                                    | "MODERADA"
+                                    | "GRAVE"
+                                    | "CRITICA"
+                            )
+                        }
+                    >
+
+                        <option value="LEVE">
+                            Leve
+                        </option>
+
+                        <option value="MODERADA">
+                            Moderada
+                        </option>
+
+                        <option value="GRAVE">
+                            Grave
+                        </option>
+
+                        <option value="CRITICA">
+                            Crítica
+                        </option>
+
+                    </select>
+
+                </div>
+
+                {/* CLIENTE */}
+                <div className="form-group">
+
                     <label htmlFor="cliente">
                         Cliente
                     </label>
@@ -183,7 +283,11 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
                         id="cliente"
                         value={clienteId}
                         onChange={(event) =>
-                            setClienteId(Number(event.target.value))
+                            setClienteId(
+                                Number(
+                                    event.target.value
+                                )
+                            )
                         }
                         required
                     >
@@ -193,18 +297,25 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
                         </option>
 
                         {clientes.map((cliente) => (
+
                             <option
                                 key={cliente.id}
                                 value={cliente.id}
                             >
-                                {cliente.nombre} - {cliente.empresa}
+                                {cliente.nombre}
+                                {" - "}
+                                {cliente.empresa}
                             </option>
+
                         ))}
 
                     </select>
+
                 </div>
 
+                {/* TÉCNICO */}
                 <div className="form-group">
+
                     <label htmlFor="tecnico">
                         Técnico
                     </label>
@@ -214,7 +325,8 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
                         value={tecnicoId ?? ""}
                         onChange={(event) => {
 
-                            const valor = event.target.value;
+                            const valor =
+                                event.target.value;
 
                             setTecnicoId(
                                 valor === ""
@@ -229,17 +341,23 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
                         </option>
 
                         {tecnicos.map((tecnico) => (
+
                             <option
                                 key={tecnico.id}
                                 value={tecnico.id}
                             >
-                                {tecnico.nombre} - {tecnico.especialidad}
+                                {tecnico.nombre}
+                                {" - "}
+                                {tecnico.especialidad}
                             </option>
+
                         ))}
 
                     </select>
+
                 </div>
 
+                {/* BOTÓN */}
                 <div className="form-actions">
 
                     <button
@@ -254,10 +372,13 @@ function SolicitudForm({ onRegistrar }: SolicitudFormProps) {
 
                 </div>
 
+                {/* MENSAJE */}
                 {mensaje && (
+
                     <p className="mensaje">
                         {mensaje}
                     </p>
+
                 )}
 
             </form>

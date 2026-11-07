@@ -3,7 +3,6 @@ package com.idat.soportetecnico.security;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -22,6 +21,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpMethod;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -48,14 +48,16 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // =========================================
-                        // LOGIN PUBLICO
-                        // =========================================
+                                // =========================================
+                                // LOGIN Y REGISTRO PUBLICO
+                                // =========================================
 
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/api/auth/login"
+                                "/api/auth/login",
+                                "/api/auth/registro"
                         ).permitAll()
+
 
                         // =========================================
                         // SWAGGER PUBLICO
@@ -67,6 +69,37 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
 
+
+                        // =========================================
+                        // CLIENTE AUTENTICADO
+                        // Solo puede trabajar con sus solicitudes
+                        // =========================================
+
+                        .requestMatchers(
+                                "/api/cliente/**"
+                        ).hasRole("CLIENTE")
+
+
+                        // =========================================
+                        // TECNICO AUTENTICADO
+                        // Solo puede trabajar con sus tickets
+                        // asignados
+                        // =========================================
+
+                        .requestMatchers(
+                                "/api/tecnico/**"
+                        ).hasRole("TECNICO")
+
+
+                        // =========================================
+                        // MODULOS EXCLUSIVOS DEL ADMINISTRADOR
+                        // =========================================
+
+                        .requestMatchers(
+                                "/api/admin/**"
+                        ).hasRole("ADMINISTRADOR")
+
+
                         // =========================================
                         // USUARIOS
                         // Solo administrador
@@ -76,97 +109,54 @@ public class SecurityConfig {
                                 "/api/usuarios/**"
                         ).hasRole("ADMINISTRADOR")
 
+
                         // =========================================
-                        // CLIENTES
-                        // Crear, modificar y eliminar:
-                        // solo administrador
+                        // CLIENTES GENERALES
+                        // Solo administrador
                         // =========================================
 
                         .requestMatchers(
-                                HttpMethod.POST,
                                 "/api/clientes/**"
                         ).hasRole("ADMINISTRADOR")
 
-                        .requestMatchers(
-                                HttpMethod.PUT,
-                                "/api/clientes/**"
-                        ).hasRole("ADMINISTRADOR")
-
-                        .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/clientes/**"
-                        ).hasRole("ADMINISTRADOR")
 
                         // =========================================
-                        // TECNICOS
-                        // Crear, modificar y eliminar:
-                        // solo administrador
+                        // TECNICOS GENERALES
+                        // Solo administrador
                         // =========================================
 
                         .requestMatchers(
-                                HttpMethod.POST,
                                 "/api/tecnicos/**"
                         ).hasRole("ADMINISTRADOR")
 
-                        .requestMatchers(
-                                HttpMethod.PUT,
-                                "/api/tecnicos/**"
-                        ).hasRole("ADMINISTRADOR")
-
-                        .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/tecnicos/**"
-                        ).hasRole("ADMINISTRADOR")
 
                         // =========================================
-                        // SOLICITUDES
+                        // SOLICITUDES GENERALES
+                        // Solo administrador
+                        //
+                        // El tecnico usara:
+                        // /api/tecnico/solicitudes/**
+                        //
+                        // El cliente usara:
+                        // /api/cliente/solicitudes/**
                         // =========================================
 
-                        // Registrar solicitudes:
-                        // solo administrador
                         .requestMatchers(
-                                HttpMethod.POST,
                                 "/api/solicitudes/**"
                         ).hasRole("ADMINISTRADOR")
 
-                        // Eliminar solicitudes:
-                        // solo administrador
-                        .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/solicitudes/**"
-                        ).hasRole("ADMINISTRADOR")
-
-                        // Consultar solicitudes:
-                        // administrador y técnico
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/solicitudes/**"
-                        ).hasAnyRole(
-                                "ADMINISTRADOR",
-                                "TECNICO"
-                        )
-
-                        // Actualizar solicitudes:
-                        // administrador y técnico
-                        .requestMatchers(
-                                HttpMethod.PUT,
-                                "/api/solicitudes/**"
-                        ).hasAnyRole(
-                                "ADMINISTRADOR",
-                                "TECNICO"
-                        )
 
                         // =========================================
                         // RESTO DE LA API
+                        // Por seguridad queda para ADMIN
                         // =========================================
 
                         .requestMatchers(
                                 "/api/**"
-                        ).hasAnyRole(
-                                "ADMINISTRADOR",
-                                "TECNICO"
-                        )
+                        ).hasRole("ADMINISTRADOR")
 
+
+                        // Otros recursos
                         .anyRequest().permitAll()
                 )
 
@@ -181,10 +171,21 @@ public class SecurityConfig {
         return http.build();
     }
 
+
+    // =========================================
+    // PASSWORD ENCODER
+    // =========================================
+
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
+
+
+    // =========================================
+    // AUTHENTICATION MANAGER
+    // =========================================
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -193,12 +194,23 @@ public class SecurityConfig {
     ) {
 
         DaoAuthenticationProvider provider =
-                new DaoAuthenticationProvider(userDetailsService);
+                new DaoAuthenticationProvider(
+                        userDetailsService
+                );
 
-        provider.setPasswordEncoder(passwordEncoder);
+        provider.setPasswordEncoder(
+                passwordEncoder
+        );
 
-        return new ProviderManager(provider);
+        return new ProviderManager(
+                provider
+        );
     }
+
+
+    // =========================================
+    // CLAVE JWT
+    // =========================================
 
     @Bean
     public SecretKey jwtSecretKey(
@@ -209,10 +221,13 @@ public class SecurityConfig {
         byte[] keyBytes;
 
         try {
+
             keyBytes = Base64
                     .getDecoder()
                     .decode(secretBase64);
+
         } catch (IllegalArgumentException exception) {
+
             throw new IllegalStateException(
                     "JWT_SECRET debe estar codificado en Base64",
                     exception
@@ -220,6 +235,7 @@ public class SecurityConfig {
         }
 
         if (keyBytes.length < 32) {
+
             throw new IllegalStateException(
                     "JWT_SECRET debe tener como mínimo 32 bytes"
             );
@@ -231,6 +247,11 @@ public class SecurityConfig {
         );
     }
 
+
+    // =========================================
+    // JWT ENCODER
+    // =========================================
+
     @Bean
     public JwtEncoder jwtEncoder(
             SecretKey secretKey
@@ -240,6 +261,11 @@ public class SecurityConfig {
                 .withSecretKey(secretKey)
                 .build();
     }
+
+
+    // =========================================
+    // JWT DECODER
+    // =========================================
 
     @Bean
     public JwtDecoder jwtDecoder(
@@ -251,32 +277,52 @@ public class SecurityConfig {
         NimbusJwtDecoder decoder =
                 NimbusJwtDecoder
                         .withSecretKey(secretKey)
-                        .macAlgorithm(MacAlgorithm.HS256)
+                        .macAlgorithm(
+                                MacAlgorithm.HS256
+                        )
                         .build();
 
         decoder.setJwtValidator(
                 JwtValidators
-                        .createDefaultWithIssuer(issuer)
+                        .createDefaultWithIssuer(
+                                issuer
+                        )
         );
 
         return decoder;
     }
 
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
 
-        JwtGrantedAuthoritiesConverter authoritiesConverter =
+    // =========================================
+    // CONVERSION DE ROLES DEL JWT
+    // =========================================
+
+    @Bean
+    public JwtAuthenticationConverter
+    jwtAuthenticationConverter() {
+
+        JwtGrantedAuthoritiesConverter
+                authoritiesConverter =
                 new JwtGrantedAuthoritiesConverter();
 
-        authoritiesConverter.setAuthoritiesClaimName("roles");
-        authoritiesConverter.setAuthorityPrefix("ROLE_");
+        authoritiesConverter
+                .setAuthoritiesClaimName(
+                        "roles"
+                );
 
-        JwtAuthenticationConverter authenticationConverter =
+        authoritiesConverter
+                .setAuthorityPrefix(
+                        "ROLE_"
+                );
+
+        JwtAuthenticationConverter
+                authenticationConverter =
                 new JwtAuthenticationConverter();
 
-        authenticationConverter.setJwtGrantedAuthoritiesConverter(
-                authoritiesConverter
-        );
+        authenticationConverter
+                .setJwtGrantedAuthoritiesConverter(
+                        authoritiesConverter
+                );
 
         return authenticationConverter;
     }

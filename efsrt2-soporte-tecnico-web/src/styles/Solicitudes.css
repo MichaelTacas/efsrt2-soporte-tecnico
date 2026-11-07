@@ -247,3 +247,118 @@
     font-size: 12px;
     font-weight: 600;
 }
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 1000;
+}
+
+.modal-detalle {
+    width: min(760px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #171c26;
+    border: 1px solid #303746;
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.modal-header h2 {
+    margin: 0 0 6px;
+}
+
+.modal-header p {
+    margin: 0;
+    opacity: 0.7;
+}
+
+.modal-cerrar-x {
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.detalle-incidente,
+.detalle-descripcion {
+    margin-bottom: 22px;
+}
+
+.detalle-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.65;
+    text-transform: uppercase;
+}
+
+.detalle-descripcion p {
+    line-height: 1.6;
+    margin: 0;
+}
+
+.detalle-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 28px;
+}
+
+.detalle-grid p {
+    margin: 0;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 28px;
+}
+
+.btn-detalle {
+    background: #2563eb;
+    color: #ffffff;
+    border: 1px solid #2563eb;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-detalle:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.btn-detalle:active {
+    transform: scale(0.97);
+}
+
+.acciones-solicitud {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+    .detalle-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,5 +1,4 @@
 import type { Solicitud } from "../interfaces/Solicitud";
-import { authService } from "../services/authService";
 
 interface SolicitudEstadoActionProps {
     solicitud: Solicitud;
@@ -16,18 +15,6 @@ function SolicitudEstadoAction({
                                }: SolicitudEstadoActionProps) {
 
     // =========================================
-    // USUARIO AUTENTICADO
-    // =========================================
-
-    const usuario = authService.obtenerUsuario();
-
-    const esAdministrador =
-        usuario?.rol === "ADMINISTRADOR";
-
-    const esTecnico =
-        usuario?.rol === "TECNICO";
-
-    // =========================================
     // SOLICITUD CERRADA
     // =========================================
 
@@ -40,93 +27,54 @@ function SolicitudEstadoAction({
     }
 
     // =========================================
-    // ACCIONES DEL TÉCNICO
+    // SOLICITUD RESUELTA
+    // EL ADMINISTRADOR PUEDE CERRARLA
     // =========================================
 
-    if (esTecnico) {
-
-        if (solicitud.estado === "PENDIENTE") {
-            return (
-                <button
-                    className="btn-estado"
-                    type="button"
-                    onClick={() =>
-                        onCambiarEstado(
-                            solicitud,
-                            "EN_PROCESO"
-                        )
-                    }
-                >
-                    Iniciar atención
-                </button>
-            );
-        }
-
-        if (solicitud.estado === "EN_PROCESO") {
-            return (
-                <button
-                    className="btn-estado"
-                    type="button"
-                    onClick={() =>
-                        onCambiarEstado(
-                            solicitud,
-                            "RESUELTA"
-                        )
-                    }
-                >
-                    Marcar resuelta
-                </button>
-            );
-        }
-
-        if (solicitud.estado === "RESUELTA") {
-            return (
-                <span className="sin-accion">
-                    Pendiente de cierre
-                </span>
-            );
-        }
+    if (solicitud.estado === "RESUELTA") {
+        return (
+            <button
+                className="btn-estado"
+                type="button"
+                onClick={() =>
+                    onCambiarEstado(
+                        solicitud,
+                        "CERRADA"
+                    )
+                }
+            >
+                Cerrar solicitud
+            </button>
+        );
     }
 
     // =========================================
-    // ACCIONES DEL ADMINISTRADOR
+    // SOLICITUD PENDIENTE
     // =========================================
 
-    if (esAdministrador) {
-
-        if (solicitud.estado === "RESUELTA") {
-            return (
-                <button
-                    className="btn-estado"
-                    type="button"
-                    onClick={() =>
-                        onCambiarEstado(
-                            solicitud,
-                            "CERRADA"
-                        )
-                    }
-                >
-                    Cerrar solicitud
-                </button>
-            );
-        }
-
-        if (solicitud.estado === "PENDIENTE") {
-            return (
-                <span className="sin-accion">
-                    Pendiente de atención
-                </span>
-            );
-        }
-
-        if (solicitud.estado === "EN_PROCESO") {
-            return (
-                <span className="sin-accion">
-                    En atención
-                </span>
-            );
-        }
+    if (solicitud.estado === "PENDIENTE") {
+        return (
+            <span className="sin-accion">
+                Pendiente de atención
+            </span>
+        );
     }
+
+    // =========================================
+    // SOLICITUD EN PROCESO
+    // =========================================
+
+    if (solicitud.estado === "EN_PROCESO") {
+        return (
+            <span className="sin-accion">
+                En atención
+            </span>
+        );
+    }
+
+    // =========================================
+    // ESTADO NO CONTEMPLADO
+    // =========================================
 
     return (
         <span className="sin-accion">

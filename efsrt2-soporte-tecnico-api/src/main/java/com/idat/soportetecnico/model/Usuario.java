@@ -23,6 +23,14 @@ public class Usuario {
     @Column(nullable = false)
     private boolean activo = true;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", unique = true)
+    private Cliente cliente;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tecnico_id", unique = true)
+    private Tecnico tecnico;
+
     public Usuario() {
     }
 
@@ -64,5 +72,21 @@ public class Usuario {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public Tecnico getTecnico() {
+        return tecnico;
+    }
+
+    public void setTecnico(Tecnico tecnico) {
+        this.tecnico = tecnico;
     }
 }

@@ -406,6 +406,35 @@ $env:ADMIN_PASSWORD="TU_CONTRASEÑA_ADMIN"
 
 Las contraseñas y secretos reales no deben almacenarse directamente en el repositorio.
 
+## Crear usuarios y probar los roles
+
+Al iniciar, el backend crea el administrador inicial (`ADMIN_EMAIL` / `ADMIN_PASSWORD`). El rol `TECNICO` se crea desde la API, con la sesión del administrador:
+
+1. Iniciar sesión en `POST /api/auth/login`:
+
+```json
+{
+  "email": "admin@grzasociados.com",
+  "password": "TU_CONTRASEÑA_ADMIN"
+}
+```
+
+2. Copiar el `token` de la respuesta y usarlo en Swagger (botón **Authorize**) o como `Authorization: Bearer <token>`.
+
+3. Crear el técnico con `POST /api/usuarios`:
+
+```json
+{
+  "email": "tecnico@grzasociados.com",
+  "password": "Tecnico2026!",
+  "rol": "TECNICO"
+}
+```
+
+Con ese usuario se puede iniciar sesión en el frontend y comprobar que el técnico consulta solicitudes y cambia estados, pero no registra solicitudes ni cierra una solicitud resuelta.
+
+La colección de Postman (`efsrt2-soporte-tecnico-api/postman`) automatiza estos pasos en la carpeta **00 - Autenticación y usuarios (JWT)**: solo se debe definir la variable `adminPassword`.
+
 ## Ejecutar Spring Boot
 
 ```powershell

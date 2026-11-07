@@ -10,5 +10,9 @@ public interface UsuarioRepository
 
     Optional<Usuario> findByEmailIgnoreCase(String email);
 
+    Optional<Usuario> findByEmail(String email);
+
     boolean existsByEmailIgnoreCase(String email);
+
+    Optional<Usuario> findByCliente_Id(Long clienteId);
 }

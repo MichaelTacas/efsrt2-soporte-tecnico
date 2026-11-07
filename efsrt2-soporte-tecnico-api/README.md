@@ -209,6 +209,16 @@ $env:ADMIN_PASSWORD="TU_CONTRASEÑA_DE_DESARROLLO"
 
 Las contraseñas y secretos reales no deben almacenarse directamente en GitHub.
 
+## Crear usuarios y probar los roles
+
+El administrador inicial se crea al iniciar la API (`ADMIN_EMAIL` / `ADMIN_PASSWORD`). El rol `TECNICO` se crea con la sesión del administrador:
+
+1. `POST /api/auth/login` con `{"email": "admin@grzasociados.com", "password": "TU_CONTRASEÑA_ADMIN"}`.
+2. Usar el `token` devuelto en Swagger (botón **Authorize**) o como `Authorization: Bearer <token>`.
+3. `POST /api/usuarios` con `{"email": "tecnico@grzasociados.com", "password": "Tecnico2026!", "rol": "TECNICO"}`.
+
+La colección de Postman (`postman/`) automatiza estos pasos en la carpeta **00 - Autenticación y usuarios (JWT)**; solo se debe definir la variable `adminPassword`.
+
 ---
 
 # Seguridad

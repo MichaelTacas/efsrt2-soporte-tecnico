@@ -5,4 +5,5 @@ export interface SolicitudRequest {
     clienteId: number;
     tecnicoId: number | null;
     estado?: "PENDIENTE" | "EN_PROCESO" | "RESUELTA" | "CERRADA";
+    gravedad: "LEVE" | "MODERADA" | "GRAVE" | "CRITICA";
 }

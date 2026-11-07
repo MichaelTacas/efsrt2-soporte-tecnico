@@ -1,3 +1,7 @@
+/* =========================================
+   CONTENEDOR GENERAL
+========================================= */
+
 .login-page {
     min-height: 100vh;
     display: flex;
@@ -6,6 +10,11 @@
     padding: 24px;
     background: #0f172a;
 }
+
+
+/* =========================================
+   TARJETA
+========================================= */
 
 .login-card {
     width: 100%;
@@ -16,21 +25,33 @@
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
 }
 
+
+/* =========================================
+   ENCABEZADO
+========================================= */
+
 .login-header {
     margin-bottom: 28px;
 }
 
-.login-header h1 {
+.login-header h1,
+.login-card > h1 {
     margin: 0 0 8px;
     color: #f8fafc;
     font-size: 28px;
 }
 
-.login-header p {
-    margin: 0;
+.login-header p,
+.login-card > p {
+    margin: 0 0 28px;
     color: #94a3b8;
     line-height: 1.5;
 }
+
+
+/* =========================================
+   FORMULARIO
+========================================= */
 
 .login-form {
     display: flex;
@@ -38,18 +59,26 @@
     gap: 20px;
 }
 
-.login-field {
+
+/* =========================================
+   CAMPOS LOGIN Y REGISTRO
+========================================= */
+
+.login-field,
+.form-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.login-field label {
+.login-field label,
+.form-group label {
     color: #e2e8f0;
     font-weight: 600;
 }
 
-.login-field input {
+.login-field input,
+.form-group input {
     width: 100%;
     padding: 12px 14px;
     border: 1px solid #475569;
@@ -58,18 +87,30 @@
     color: #f8fafc;
     font-size: 15px;
     box-sizing: border-box;
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
 }
 
-.login-field input:focus {
+.login-field input:focus,
+.form-group input:focus {
     outline: none;
     border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
 }
 
-.login-field input::placeholder {
+.login-field input::placeholder,
+.form-group input::placeholder {
     color: #64748b;
 }
 
-.login-error {
+
+/* =========================================
+   MENSAJES
+========================================= */
+
+.login-error,
+.mensaje-error {
     margin: 0;
     padding: 10px 12px;
     border-radius: 8px;
@@ -78,16 +119,31 @@
     font-size: 14px;
 }
 
+.mensaje-exito {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(22, 163, 74, 0.15);
+    color: #86efac;
+    font-size: 14px;
+}
+
+
+/* =========================================
+   BOTÓN PRINCIPAL LOGIN
+========================================= */
+
 .login-button {
     width: 100%;
     padding: 12px 16px;
     border: none;
     border-radius: 8px;
     background: #0284c7;
-    color: white;
+    color: #ffffff;
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
+    transition: background 0.2s ease;
 }
 
 .login-button:hover:not(:disabled) {
@@ -97,4 +153,122 @@
 .login-button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+
+/* =========================================
+   BOTÓN PRINCIPAL REGISTRO
+========================================= */
+
+.login-card .btn-primary {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.login-card .btn-primary:hover:not(:disabled) {
+    background: #0369a1;
+}
+
+.login-card .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   CREAR CUENTA DESDE LOGIN
+========================================= */
+
+.login-register {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #334155;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.login-register-button {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #38bdf8;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.login-register-button:hover {
+    color: #7dd3fc;
+    text-decoration: underline;
+}
+
+
+/* =========================================
+   VOLVER AL LOGIN DESDE REGISTRO
+========================================= */
+
+.registro-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #334155;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.btn-link {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #38bdf8;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-link:hover {
+    color: #7dd3fc;
+    text-decoration: underline;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 480px) {
+
+    .login-page {
+        padding: 16px;
+    }
+
+    .login-card {
+        padding: 24px 20px;
+    }
+
+    .login-header h1,
+    .login-card > h1 {
+        font-size: 24px;
+    }
+
+    .login-register,
+    .registro-login {
+        flex-direction: column;
+        gap: 8px;
+    }
 }

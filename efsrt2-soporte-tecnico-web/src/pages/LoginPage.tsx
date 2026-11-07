@@ -1,20 +1,34 @@
-import { useState, type FormEvent } from 'react';
-import { authService } from '../services/authService';
-import '../styles/Login.css';
+import { useState, type FormEvent } from "react";
+
+import { authService } from "../services/authService";
+
+import "../styles/Login.css";
 
 interface LoginPageProps {
     onLoginExitoso: () => void;
+    onCrearCuenta: () => void;
 }
 
 export function LoginPage({
                               onLoginExitoso,
+                              onCrearCuenta
                           }: LoginPageProps) {
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] =
+        useState("");
 
-    const [cargando, setCargando] = useState(false);
-    const [error, setError] = useState('');
+    const [password, setPassword] =
+        useState("");
+
+    const [cargando, setCargando] =
+        useState(false);
+
+    const [error, setError] =
+        useState("");
+
+    // =========================================
+    // INICIAR SESIÓN
+    // =========================================
 
     const iniciarSesion = async (
         event: FormEvent<HTMLFormElement>
@@ -22,14 +36,14 @@ export function LoginPage({
 
         event.preventDefault();
 
-        setError('');
+        setError("");
         setCargando(true);
 
         try {
 
             await authService.login({
                 email,
-                password,
+                password
             });
 
             onLoginExitoso();
@@ -37,12 +51,20 @@ export function LoginPage({
         } catch (error) {
 
             if (error instanceof Error) {
-                setError(error.message);
+
+                setError(
+                    error.message
+                );
+
             } else {
-                setError('Ocurrió un error al iniciar sesión');
+
+                setError(
+                    "Ocurrió un error al iniciar sesión"
+                );
             }
 
         } finally {
+
             setCargando(false);
         }
     };
@@ -53,17 +75,24 @@ export function LoginPage({
             <section className="login-card">
 
                 <div className="login-header">
-                    <h1>Soporte Técnico</h1>
+
+                    <h1>
+                        Soporte Técnico
+                    </h1>
 
                     <p>
-                        Ingresa con tu cuenta para acceder al sistema.
+                        Ingresa con tu cuenta para
+                        acceder al sistema.
                     </p>
+
                 </div>
 
                 <form
                     className="login-form"
                     onSubmit={iniciarSesion}
                 >
+
+                    {/* CORREO */}
 
                     <div className="login-field">
 
@@ -76,14 +105,18 @@ export function LoginPage({
                             type="email"
                             value={email}
                             onChange={(event) =>
-                                setEmail(event.target.value)
+                                setEmail(
+                                    event.target.value
+                                )
                             }
-                            placeholder="usuario@grzasociados.com"
+                            placeholder="usuario@empresa.com"
                             required
                             autoComplete="email"
                         />
 
                     </div>
+
+                    {/* CONTRASEÑA */}
 
                     <div className="login-field">
 
@@ -96,7 +129,9 @@ export function LoginPage({
                             type="password"
                             value={password}
                             onChange={(event) =>
-                                setPassword(event.target.value)
+                                setPassword(
+                                    event.target.value
+                                )
                             }
                             placeholder="Ingresa tu contraseña"
                             required
@@ -105,11 +140,17 @@ export function LoginPage({
 
                     </div>
 
+                    {/* ERROR */}
+
                     {error && (
+
                         <p className="login-error">
                             {error}
                         </p>
+
                     )}
+
+                    {/* INICIAR SESIÓN */}
 
                     <button
                         type="submit"
@@ -117,11 +158,31 @@ export function LoginPage({
                         disabled={cargando}
                     >
                         {cargando
-                            ? 'Ingresando...'
-                            : 'Iniciar sesión'}
+                            ? "Ingresando..."
+                            : "Iniciar sesión"}
                     </button>
 
                 </form>
+
+                {/* =====================================
+                    REGISTRO
+                ====================================== */}
+
+                <div className="login-register">
+
+                    <span>
+                        ¿No tienes una cuenta?
+                    </span>
+
+                    <button
+                        type="button"
+                        className="login-register-button"
+                        onClick={onCrearCuenta}
+                    >
+                        Crear cuenta
+                    </button>
+
+                </div>
 
             </section>
 

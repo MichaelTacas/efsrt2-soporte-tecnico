@@ -64,6 +64,14 @@ public class AuthServiceImpl implements AuthService {
                         )
                 );
 
+        if (!usuario.isActivo()) {
+            throw new AutenticacionException(
+                    "El usuario se encuentra desactivado"
+            );
+        }
+
+
+
         String token =
                 jwtService.generarToken(usuario);
 

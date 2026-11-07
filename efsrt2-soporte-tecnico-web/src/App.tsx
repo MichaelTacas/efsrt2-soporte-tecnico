@@ -1,41 +1,145 @@
-import { useState } from 'react';
-import { LoginPage } from './pages/LoginPage';
-import SolicitudesPage from './pages/SolicitudesPage';
-import { AppHeader } from './components/AppHeader';
-import { authService } from './services/authService';
+import { useState } from "react";
+
+import { LoginPage } from "./pages/LoginPage";
+import RegistroPage from "./pages/RegistroPage";
+
+import SolicitudesPage from "./pages/SolicitudesPage";
+import TecnicoSolicitudesPage from "./pages/TecnicoSolicitudesPage";
+import ClienteSolicitudesPage from "./pages/ClienteSolicitudesPage";
+
+import { AppHeader } from "./components/AppHeader";
+
+import { authService } from "./services/authService";
 
 function App() {
 
-  const [autenticado, setAutenticado] = useState(
-      authService.estaAutenticado()
-  );
+    const [autenticado, setAutenticado] =
+        useState(
+            authService.estaAutenticado()
+        );
 
-  const manejarLoginExitoso = () => {
-    setAutenticado(true);
-  };
+    const [mostrarRegistro, setMostrarRegistro] =
+        useState(false);
 
-  const manejarCerrarSesion = () => {
-    authService.cerrarSesion();
-    setAutenticado(false);
-  };
+    // =========================================
+    // LOGIN EXITOSO
+    // =========================================
 
-  if (!autenticado) {
+    const manejarLoginExitoso = () => {
+
+        setAutenticado(true);
+        setMostrarRegistro(false);
+    };
+
+    // =========================================
+    // CERRAR SESIÓN
+    // =========================================
+
+    const manejarCerrarSesion = () => {
+
+        authService.cerrarSesion();
+
+        setAutenticado(false);
+        setMostrarRegistro(false);
+    };
+
+    // =========================================
+    // USUARIO NO AUTENTICADO
+    // =========================================
+
+    if (!autenticado) {
+
+        if (mostrarRegistro) {
+
+            return (
+                <RegistroPage
+                    onVolverLogin={() =>
+                        setMostrarRegistro(false)
+                    }
+                />
+            );
+        }
+
+        return (
+            <LoginPage
+                onLoginExitoso={
+                    manejarLoginExitoso
+                }
+                onCrearCuenta={() =>
+                    setMostrarRegistro(true)
+                }
+            />
+        );
+    }
+
+    // =========================================
+    // USUARIO AUTENTICADO
+    // =========================================
+
+    const usuario =
+        authService.obtenerUsuario();
+
+    const renderContenido = () => {
+
+        if (
+            usuario?.rol ===
+            "ADMINISTRADOR"
+        ) {
+
+            return (
+                <SolicitudesPage />
+            );
+        }
+
+        if (
+            usuario?.rol ===
+            "TECNICO"
+        ) {
+
+            return (
+                <TecnicoSolicitudesPage />
+            );
+        }
+
+        if (
+            usuario?.rol ===
+            "CLIENTE"
+        ) {
+
+            return (
+                <ClienteSolicitudesPage />
+            );
+        }
+
+        return (
+            <main
+                style={{
+                    padding: "2rem"
+                }}
+            >
+                <h1>
+                    Acceso no disponible
+                </h1>
+
+                <p>
+                    El usuario no tiene un rol
+                    válido para acceder al sistema.
+                </p>
+            </main>
+        );
+    };
+
     return (
-        <LoginPage
-            onLoginExitoso={manejarLoginExitoso}
-        />
+        <>
+            <AppHeader
+                onCerrarSesion={
+                    manejarCerrarSesion
+                }
+            />
+
+            {renderContenido()}
+        </>
     );
-  }
-
-  return (
-      <>
-        <AppHeader
-            onCerrarSesion={manejarCerrarSesion}
-        />
-
-        <SolicitudesPage />
-      </>
-  );
 }
 
 export default App;

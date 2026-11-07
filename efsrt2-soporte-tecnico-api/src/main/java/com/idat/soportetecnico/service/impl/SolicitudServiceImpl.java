@@ -5,10 +5,12 @@ import com.idat.soportetecnico.model.EstadoSolicitud;
 import com.idat.soportetecnico.model.Prioridad;
 import com.idat.soportetecnico.model.Solicitud;
 import com.idat.soportetecnico.repository.SolicitudRepository;
+import com.idat.soportetecnico.service.FechaLimiteService;
 import com.idat.soportetecnico.service.SolicitudService;
 import com.idat.soportetecnico.validator.SolicitudValidator;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -16,13 +18,16 @@ public class SolicitudServiceImpl implements SolicitudService {
 
     private final SolicitudRepository solicitudRepository;
     private final List<SolicitudValidator> validadores;
+    private final FechaLimiteService fechaLimiteService;
 
     public SolicitudServiceImpl(
             SolicitudRepository solicitudRepository,
-            List<SolicitudValidator> validadores
+            List<SolicitudValidator> validadores,
+            FechaLimiteService fechaLimiteService
     ) {
         this.solicitudRepository = solicitudRepository;
         this.validadores = validadores;
+        this.fechaLimiteService = fechaLimiteService;
     }
 
     @Override
@@ -33,6 +38,17 @@ public class SolicitudServiceImpl implements SolicitudService {
         );
 
         solicitud.setEstado(EstadoSolicitud.PENDIENTE);
+
+        LocalDateTime fechaCreacion = LocalDateTime.now();
+
+        solicitud.setFechaCreacion(fechaCreacion);
+
+        solicitud.setFechaLimite(
+                fechaLimiteService.calcularFechaLimite(
+                        fechaCreacion,
+                        solicitud.getGravedad()
+                )
+        );
 
         return solicitudRepository.save(solicitud);
     }
@@ -80,6 +96,10 @@ public class SolicitudServiceImpl implements SolicitudService {
                 solicitudActualizada.getPrioridad()
         );
 
+        solicitudExistente.setGravedad(
+                solicitudActualizada.getGravedad()
+        );
+
         solicitudExistente.setCliente(
                 solicitudActualizada.getCliente()
         );
@@ -88,10 +108,34 @@ public class SolicitudServiceImpl implements SolicitudService {
                 solicitudActualizada.getTecnico()
         );
 
-        if (solicitudActualizada.getEstado() != null) {
-            solicitudExistente.setEstado(
-                    solicitudActualizada.getEstado()
-            );
+        if (solicitudActualizada.getEstado() != null
+                && solicitudActualizada.getEstado()
+                != solicitudExistente.getEstado()) {
+
+            EstadoSolicitud nuevoEstado =
+                    solicitudActualizada.getEstado();
+
+            LocalDateTime ahora = LocalDateTime.now();
+
+            if (nuevoEstado == EstadoSolicitud.EN_PROCESO
+                    && solicitudExistente.getFechaInicioAtencion() == null) {
+
+                solicitudExistente.setFechaInicioAtencion(ahora);
+            }
+
+            if (nuevoEstado == EstadoSolicitud.RESUELTA
+                    && solicitudExistente.getFechaResolucion() == null) {
+
+                solicitudExistente.setFechaResolucion(ahora);
+            }
+
+            if (nuevoEstado == EstadoSolicitud.CERRADA
+                    && solicitudExistente.getFechaCierre() == null) {
+
+                solicitudExistente.setFechaCierre(ahora);
+            }
+
+            solicitudExistente.setEstado(nuevoEstado);
         }
 
         return solicitudRepository.save(solicitudExistente);

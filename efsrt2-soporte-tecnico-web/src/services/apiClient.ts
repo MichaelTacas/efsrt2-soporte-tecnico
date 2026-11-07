@@ -1,4 +1,4 @@
-import { authService } from './authService';
+import { authService } from "./authService";
 
 async function request<T>(
     url: string,
@@ -10,13 +10,13 @@ async function request<T>(
     const headers = new Headers(options.headers);
 
     headers.set(
-        'Content-Type',
-        'application/json'
+        "Content-Type",
+        "application/json"
     );
 
     if (token) {
         headers.set(
-            'Authorization',
+            "Authorization",
             `Bearer ${token}`
         );
     }
@@ -29,16 +29,18 @@ async function request<T>(
     if (!response.ok) {
 
         if (response.status === 401) {
+
             authService.cerrarSesion();
 
             throw new Error(
-                'Tu sesión ha expirado. Inicia sesión nuevamente.'
+                "Tu sesión ha expirado. Inicia sesión nuevamente."
             );
         }
 
         if (response.status === 403) {
+
             throw new Error(
-                'No tienes permisos para realizar esta acción.'
+                "No tienes permisos para realizar esta acción."
             );
         }
 
@@ -61,7 +63,10 @@ async function request<T>(
 
 export const apiClient = {
 
-    get<T>(url: string): Promise<T> {
+    get<T>(
+        url: string
+    ): Promise<T> {
+
         return request<T>(url);
     },
 
@@ -71,7 +76,7 @@ export const apiClient = {
     ): Promise<T> {
 
         return request<T>(url, {
-            method: 'POST',
+            method: "POST",
             body: JSON.stringify(body)
         });
     },
@@ -82,8 +87,22 @@ export const apiClient = {
     ): Promise<T> {
 
         return request<T>(url, {
-            method: 'PUT',
+            method: "PUT",
             body: JSON.stringify(body)
+        });
+    },
+
+    patch<T>(
+        url: string,
+        body?: unknown
+    ): Promise<T> {
+
+        return request<T>(url, {
+            method: "PATCH",
+            body:
+                body !== undefined
+                    ? JSON.stringify(body)
+                    : undefined
         });
     }
 

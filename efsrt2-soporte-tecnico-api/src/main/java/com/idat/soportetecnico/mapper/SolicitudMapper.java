@@ -21,6 +21,7 @@ public class SolicitudMapper {
         solicitud.setTitulo(request.getTitulo());
         solicitud.setDescripcion(request.getDescripcion());
         solicitud.setPrioridad(request.getPrioridad());
+        solicitud.setGravedad(request.getGravedad());
         solicitud.setEstado(request.getEstado());
         solicitud.setCliente(cliente);
         solicitud.setTecnico(tecnico);
@@ -37,6 +38,13 @@ public class SolicitudMapper {
         response.setDescripcion(solicitud.getDescripcion());
         response.setPrioridad(solicitud.getPrioridad());
         response.setEstado(solicitud.getEstado());
+        response.setGravedad(solicitud.getGravedad());
+
+        response.setFechaCreacion(solicitud.getFechaCreacion());
+        response.setFechaLimite(solicitud.getFechaLimite());
+        response.setFechaInicioAtencion(solicitud.getFechaInicioAtencion());
+        response.setFechaResolucion(solicitud.getFechaResolucion());
+        response.setFechaCierre(solicitud.getFechaCierre());
 
         if (solicitud.getCliente() != null) {
             response.setClienteId(
