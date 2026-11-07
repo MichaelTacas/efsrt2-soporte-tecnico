@@ -1,8 +1,8 @@
 package com.idat.soportetecnico.dto;
 
 import com.idat.soportetecnico.model.EstadoSolicitud;
-import com.idat.soportetecnico.model.Prioridad;
 import com.idat.soportetecnico.model.GravedadIncidencia;
+import com.idat.soportetecnico.model.Prioridad;
 
 import java.time.LocalDateTime;
 
@@ -14,36 +14,41 @@ public class SolicitudResponse {
     private Prioridad prioridad;
     private EstadoSolicitud estado;
 
+    // Datos del cliente
     private Long clienteId;
     private String clienteNombre;
+    private String clienteEmpresa;
+    private String clienteArea;
+    private String clienteTelefono;
 
+    // Datos del técnico
     private Long tecnicoId;
     private String tecnicoNombre;
+
+    // Clasificación
     private GravedadIncidencia gravedad;
 
+    // Fechas
     private LocalDateTime fechaCreacion;
-
     private LocalDateTime fechaLimite;
-
     private LocalDateTime fechaInicioAtencion;
-
     private LocalDateTime fechaResolucion;
-
     private LocalDateTime fechaCierre;
 
     public SolicitudResponse() {
     }
 
-    public SolicitudResponse(Long id,
-                             String titulo,
-                             String descripcion,
-                             Prioridad prioridad,
-                             EstadoSolicitud estado,
-                             Long clienteId,
-                             String clienteNombre,
-                             Long tecnicoId,
-                             String tecnicoNombre) {
-
+    public SolicitudResponse(
+            Long id,
+            String titulo,
+            String descripcion,
+            Prioridad prioridad,
+            EstadoSolicitud estado,
+            Long clienteId,
+            String clienteNombre,
+            Long tecnicoId,
+            String tecnicoNombre
+    ) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -111,6 +116,30 @@ public class SolicitudResponse {
         this.clienteNombre = clienteNombre;
     }
 
+    public String getClienteEmpresa() {
+        return clienteEmpresa;
+    }
+
+    public void setClienteEmpresa(String clienteEmpresa) {
+        this.clienteEmpresa = clienteEmpresa;
+    }
+
+    public String getClienteArea() {
+        return clienteArea;
+    }
+
+    public void setClienteArea(String clienteArea) {
+        this.clienteArea = clienteArea;
+    }
+
+    public String getClienteTelefono() {
+        return clienteTelefono;
+    }
+
+    public void setClienteTelefono(String clienteTelefono) {
+        this.clienteTelefono = clienteTelefono;
+    }
+
     public Long getTecnicoId() {
         return tecnicoId;
     }
@@ -126,6 +155,7 @@ public class SolicitudResponse {
     public void setTecnicoNombre(String tecnicoNombre) {
         this.tecnicoNombre = tecnicoNombre;
     }
+
     public GravedadIncidencia getGravedad() {
         return gravedad;
     }

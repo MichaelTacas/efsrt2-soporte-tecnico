@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 
 import type { RegistroClienteRequest } from "../interfaces/RegistroClienteRequest";
-
 import { registroService } from "../services/registroService";
 
 interface RegistroPageProps {
@@ -20,6 +19,12 @@ export default function RegistroPage({
         useState("");
 
     const [empresa, setEmpresa] =
+        useState("");
+
+    const [area, setArea] =
+        useState("");
+
+    const [telefono, setTelefono] =
         useState("");
 
     const [password, setPassword] =
@@ -48,6 +53,7 @@ export default function RegistroPage({
         event.preventDefault();
 
         setMensaje("");
+        setRegistroExitoso(false);
 
         if (password !== confirmarPassword) {
 
@@ -71,6 +77,8 @@ export default function RegistroPage({
             nombre,
             email,
             empresa,
+            area,
+            telefono,
             password
         };
 
@@ -91,10 +99,14 @@ export default function RegistroPage({
             setNombre("");
             setEmail("");
             setEmpresa("");
+            setArea("");
+            setTelefono("");
             setPassword("");
             setConfirmarPassword("");
 
         } catch (error) {
+
+            setRegistroExitoso(false);
 
             if (error instanceof Error) {
 
@@ -123,8 +135,7 @@ export default function RegistroPage({
                 </h1>
 
                 <p>
-                    Regístrate para solicitar
-                    soporte técnico.
+                    Regístrate para solicitar soporte técnico.
                 </p>
 
                 <form
@@ -132,6 +143,7 @@ export default function RegistroPage({
                     onSubmit={handleSubmit}
                 >
 
+                    {/* NOMBRE */}
                     <div className="form-group">
 
                         <label htmlFor="nombre">
@@ -143,9 +155,7 @@ export default function RegistroPage({
                             type="text"
                             value={nombre}
                             onChange={(event) =>
-                                setNombre(
-                                    event.target.value
-                                )
+                                setNombre(event.target.value)
                             }
                             placeholder="Ej. Pedro Quispe"
                             required
@@ -153,6 +163,7 @@ export default function RegistroPage({
 
                     </div>
 
+                    {/* CORREO */}
                     <div className="form-group">
 
                         <label htmlFor="email">
@@ -164,9 +175,7 @@ export default function RegistroPage({
                             type="email"
                             value={email}
                             onChange={(event) =>
-                                setEmail(
-                                    event.target.value
-                                )
+                                setEmail(event.target.value)
                             }
                             placeholder="correo@empresa.com"
                             required
@@ -174,6 +183,7 @@ export default function RegistroPage({
 
                     </div>
 
+                    {/* EMPRESA */}
                     <div className="form-group">
 
                         <label htmlFor="empresa">
@@ -185,9 +195,7 @@ export default function RegistroPage({
                             type="text"
                             value={empresa}
                             onChange={(event) =>
-                                setEmpresa(
-                                    event.target.value
-                                )
+                                setEmpresa(event.target.value)
                             }
                             placeholder="Ej. Empresa ABC"
                             required
@@ -195,6 +203,47 @@ export default function RegistroPage({
 
                     </div>
 
+                    {/* AREA */}
+                    <div className="form-group">
+
+                        <label htmlFor="area">
+                            Área
+                        </label>
+
+                        <input
+                            id="area"
+                            type="text"
+                            value={area}
+                            onChange={(event) =>
+                                setArea(event.target.value)
+                            }
+                            placeholder="Ej. Contabilidad"
+                            required
+                        />
+
+                    </div>
+
+                    {/* TELEFONO */}
+                    <div className="form-group">
+
+                        <label htmlFor="telefono">
+                            Número de teléfono
+                        </label>
+
+                        <input
+                            id="telefono"
+                            type="tel"
+                            value={telefono}
+                            onChange={(event) =>
+                                setTelefono(event.target.value)
+                            }
+                            placeholder="Ej. 987654321"
+                            required
+                        />
+
+                    </div>
+
+                    {/* CONTRASEÑA */}
                     <div className="form-group">
 
                         <label htmlFor="password">
@@ -206,9 +255,7 @@ export default function RegistroPage({
                             type="password"
                             value={password}
                             onChange={(event) =>
-                                setPassword(
-                                    event.target.value
-                                )
+                                setPassword(event.target.value)
                             }
                             placeholder="Mínimo 8 caracteres"
                             required
@@ -216,6 +263,7 @@ export default function RegistroPage({
 
                     </div>
 
+                    {/* CONFIRMAR CONTRASEÑA */}
                     <div className="form-group">
 
                         <label htmlFor="confirmarPassword">
@@ -237,6 +285,7 @@ export default function RegistroPage({
 
                     </div>
 
+                    {/* MENSAJE */}
                     {mensaje && (
                         <p
                             className={
@@ -249,6 +298,7 @@ export default function RegistroPage({
                         </p>
                     )}
 
+                    {/* BOTON */}
                     <button
                         className="btn-primary"
                         type="submit"

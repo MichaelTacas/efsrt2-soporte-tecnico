@@ -11,7 +11,6 @@ import com.idat.soportetecnico.model.Usuario;
 import com.idat.soportetecnico.repository.SolicitudRepository;
 import com.idat.soportetecnico.repository.UsuarioRepository;
 import com.idat.soportetecnico.service.ClienteSolicitudService;
-import com.idat.soportetecnico.service.FechaLimiteService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,18 +23,15 @@ public class ClienteSolicitudServiceImpl
     private final UsuarioRepository usuarioRepository;
     private final SolicitudRepository solicitudRepository;
     private final SolicitudMapper solicitudMapper;
-    private final FechaLimiteService fechaLimiteService;
 
     public ClienteSolicitudServiceImpl(
             UsuarioRepository usuarioRepository,
             SolicitudRepository solicitudRepository,
-            SolicitudMapper solicitudMapper,
-            FechaLimiteService fechaLimiteService
+            SolicitudMapper solicitudMapper
     ) {
         this.usuarioRepository = usuarioRepository;
         this.solicitudRepository = solicitudRepository;
         this.solicitudMapper = solicitudMapper;
-        this.fechaLimiteService = fechaLimiteService;
     }
 
     @Override
@@ -48,33 +44,38 @@ public class ClienteSolicitudServiceImpl
 
         Solicitud solicitud = new Solicitud();
 
-        solicitud.setTitulo(request.getTitulo());
-        solicitud.setDescripcion(request.getDescripcion());
-        solicitud.setPrioridad(request.getPrioridad());
-        solicitud.setGravedad(request.getGravedad());
+        solicitud.setTitulo(
+                request.getTitulo().trim()
+        );
+
+        solicitud.setDescripcion(
+                request.getDescripcion().trim()
+        );
+
+        solicitud.setPrioridad(
+                request.getPrioridad()
+        );
 
         solicitud.setCliente(cliente);
 
-        // El cliente no puede asignarse técnico
+        // El cliente no puede asignarse un técnico.
         solicitud.setTecnico(null);
+
+        // La gravedad será definida posteriormente
+        // por el administrador.
+        solicitud.setGravedad(null);
 
         solicitud.setEstado(
                 EstadoSolicitud.PENDIENTE
         );
 
-        LocalDateTime fechaCreacion =
-                LocalDateTime.now();
-
         solicitud.setFechaCreacion(
-                fechaCreacion
+                LocalDateTime.now()
         );
 
-        solicitud.setFechaLimite(
-                fechaLimiteService.calcularFechaLimite(
-                        fechaCreacion,
-                        request.getGravedad()
-                )
-        );
+        // La fecha límite se calculará cuando
+        // el administrador asigne la gravedad.
+        solicitud.setFechaLimite(null);
 
         Solicitud guardada =
                 solicitudRepository.save(solicitud);

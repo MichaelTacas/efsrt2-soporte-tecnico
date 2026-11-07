@@ -26,21 +26,20 @@ public class RegistroPublicoController {
             @Valid @RequestBody RegistroPublicoClienteRequest request
     ) {
 
-        RegistroClienteRequest registro =
+        RegistroClienteRequest registroRequest =
                 new RegistroClienteRequest();
 
-        registro.setNombre(request.getNombre());
-        registro.setEmail(request.getEmail());
-        registro.setEmpresa(request.getEmpresa());
-        registro.setPassword(request.getPassword());
-
-        // El registro público siempre crea
-        // una cuenta activa de CLIENTE.
-        registro.setActivo(true);
+        registroRequest.setNombre(request.getNombre());
+        registroRequest.setEmail(request.getEmail());
+        registroRequest.setEmpresa(request.getEmpresa());
+        registroRequest.setArea(request.getArea());
+        registroRequest.setTelefono(request.getTelefono());
+        registroRequest.setPassword(request.getPassword());
+        registroRequest.setActivo(true);
 
         AdminClienteResponse response =
                 registroClienteService.registrarCliente(
-                        registro
+                        registroRequest
                 );
 
         return ResponseEntity

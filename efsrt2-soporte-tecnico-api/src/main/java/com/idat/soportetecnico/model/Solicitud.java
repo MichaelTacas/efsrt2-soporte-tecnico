@@ -44,20 +44,25 @@ public class Solicitud {
     @JoinColumn(name = "tecnico_id")
     private Tecnico tecnico;
 
+    // Puede ser null hasta que el administrador clasifique la solicitud
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private GravedadIncidencia gravedad;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
-    private LocalDateTime fechaResolucion;
-
-    private LocalDateTime fechaCierre;
-
+    // Se calcula cuando el administrador asigna la gravedad
     private LocalDateTime fechaLimite;
 
+    // Se registra cuando el técnico inicia la atención
     private LocalDateTime fechaInicioAtencion;
+
+    // Se registra cuando el técnico marca la solicitud como resuelta
+    private LocalDateTime fechaResolucion;
+
+    // Se registra cuando el administrador cierra la solicitud
+    private LocalDateTime fechaCierre;
 
     public Solicitud() {
     }
@@ -134,22 +139,6 @@ public class Solicitud {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public LocalDateTime getFechaResolucion() {
-        return fechaResolucion;
-    }
-
-    public void setFechaResolucion(LocalDateTime fechaResolucion) {
-        this.fechaResolucion = fechaResolucion;
-    }
-
-    public LocalDateTime getFechaCierre() {
-        return fechaCierre;
-    }
-
-    public void setFechaCierre(LocalDateTime fechaCierre) {
-        this.fechaCierre = fechaCierre;
-    }
-
     public LocalDateTime getFechaLimite() {
         return fechaLimite;
     }
@@ -164,5 +153,21 @@ public class Solicitud {
 
     public void setFechaInicioAtencion(LocalDateTime fechaInicioAtencion) {
         this.fechaInicioAtencion = fechaInicioAtencion;
+    }
+
+    public LocalDateTime getFechaResolucion() {
+        return fechaResolucion;
+    }
+
+    public void setFechaResolucion(LocalDateTime fechaResolucion) {
+        this.fechaResolucion = fechaResolucion;
+    }
+
+    public LocalDateTime getFechaCierre() {
+        return fechaCierre;
+    }
+
+    public void setFechaCierre(LocalDateTime fechaCierre) {
+        this.fechaCierre = fechaCierre;
     }
 }

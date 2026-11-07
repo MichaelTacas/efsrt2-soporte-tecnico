@@ -26,8 +26,8 @@ public class RegistroClienteServiceImpl implements RegistroClienteService {
     public RegistroClienteServiceImpl(
             ClienteRepository clienteRepository,
             UsuarioRepository usuarioRepository,
-            PasswordEncoder passwordEncoder) {
-
+            PasswordEncoder passwordEncoder
+    ) {
         this.clienteRepository = clienteRepository;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
@@ -36,7 +36,8 @@ public class RegistroClienteServiceImpl implements RegistroClienteService {
     @Override
     @Transactional
     public AdminClienteResponse registrarCliente(
-            RegistroClienteRequest request) {
+            RegistroClienteRequest request
+    ) {
 
         String email = request.getEmail()
                 .trim()
@@ -55,14 +56,30 @@ public class RegistroClienteServiceImpl implements RegistroClienteService {
         }
 
         Cliente cliente = new Cliente();
-        cliente.setNombre(request.getNombre().trim());
+
+        cliente.setNombre(
+                request.getNombre().trim()
+        );
+
         cliente.setEmail(email);
-        cliente.setEmpresa(request.getEmpresa().trim());
+
+        cliente.setEmpresa(
+                request.getEmpresa().trim()
+        );
+
+        cliente.setArea(
+                request.getArea().trim()
+        );
+
+        cliente.setTelefono(
+                request.getTelefono().trim()
+        );
 
         Cliente clienteGuardado =
                 clienteRepository.save(cliente);
 
         Usuario usuario = new Usuario();
+
         usuario.setEmail(email);
 
         usuario.setPasswordHash(
@@ -71,9 +88,17 @@ public class RegistroClienteServiceImpl implements RegistroClienteService {
                 )
         );
 
-        usuario.setRol(RolUsuario.CLIENTE);
-        usuario.setActivo(request.isActivo());
-        usuario.setCliente(clienteGuardado);
+        usuario.setRol(
+                RolUsuario.CLIENTE
+        );
+
+        usuario.setActivo(
+                request.isActivo()
+        );
+
+        usuario.setCliente(
+                clienteGuardado
+        );
 
         usuarioRepository.save(usuario);
 
@@ -96,13 +121,16 @@ public class RegistroClienteServiceImpl implements RegistroClienteService {
                             .orElse(null);
 
                     boolean activo =
-                            usuario != null && usuario.isActivo();
+                            usuario != null
+                                    && usuario.isActivo();
 
                     return new AdminClienteResponse(
                             cliente.getId(),
                             cliente.getNombre(),
                             cliente.getEmail(),
                             cliente.getEmpresa(),
+                            cliente.getArea(),
+                            cliente.getTelefono(),
                             cliente.getFechaCreacion(),
                             activo
                     );
@@ -114,17 +142,22 @@ public class RegistroClienteServiceImpl implements RegistroClienteService {
     @Transactional
     public AdminClienteResponse actualizarCliente(
             Long clienteId,
-            ActualizarClienteRequest request) {
+            ActualizarClienteRequest request
+    ) {
 
-        Cliente cliente = obtenerCliente(clienteId);
-        Usuario usuario = obtenerUsuarioCliente(clienteId);
+        Cliente cliente =
+                obtenerCliente(clienteId);
+
+        Usuario usuario =
+                obtenerUsuarioCliente(clienteId);
 
         String nuevoEmail = request
                 .getEmail()
                 .trim()
                 .toLowerCase();
 
-        if (!cliente.getEmail().equalsIgnoreCase(nuevoEmail)) {
+        if (!cliente.getEmail()
+                .equalsIgnoreCase(nuevoEmail)) {
 
             if (usuarioRepository
                     .findByEmailIgnoreCase(nuevoEmail)
@@ -145,23 +178,45 @@ public class RegistroClienteServiceImpl implements RegistroClienteService {
             }
         }
 
-        cliente.setNombre(request.getNombre().trim());
-        cliente.setEmail(nuevoEmail);
-        cliente.setEmpresa(request.getEmpresa().trim());
+        cliente.setNombre(
+                request.getNombre().trim()
+        );
 
-        usuario.setEmail(nuevoEmail);
+        cliente.setEmail(
+                nuevoEmail
+        );
+
+        cliente.setEmpresa(
+                request.getEmpresa().trim()
+        );
+
+        cliente.setArea(
+                request.getArea().trim()
+        );
+
+        cliente.setTelefono(
+                request.getTelefono().trim()
+        );
+
+        usuario.setEmail(
+                nuevoEmail
+        );
 
         clienteRepository.save(cliente);
         usuarioRepository.save(usuario);
 
-        return convertirRespuesta(cliente, usuario);
+        return convertirRespuesta(
+                cliente,
+                usuario
+        );
     }
 
     @Override
     @Transactional
     public void cambiarEstado(
             Long clienteId,
-            boolean activo) {
+            boolean activo
+    ) {
 
         Usuario usuario =
                 obtenerUsuarioCliente(clienteId);
@@ -175,19 +230,24 @@ public class RegistroClienteServiceImpl implements RegistroClienteService {
     @Transactional
     public void restablecerPassword(
             Long clienteId,
-            String nuevaPassword) {
+            String nuevaPassword
+    ) {
 
         Usuario usuario =
                 obtenerUsuarioCliente(clienteId);
 
         usuario.setPasswordHash(
-                passwordEncoder.encode(nuevaPassword)
+                passwordEncoder.encode(
+                        nuevaPassword
+                )
         );
 
         usuarioRepository.save(usuario);
     }
 
-    private Cliente obtenerCliente(Long clienteId) {
+    private Cliente obtenerCliente(
+            Long clienteId
+    ) {
 
         return clienteRepository
                 .findById(clienteId)
@@ -199,7 +259,8 @@ public class RegistroClienteServiceImpl implements RegistroClienteService {
     }
 
     private Usuario obtenerUsuarioCliente(
-            Long clienteId) {
+            Long clienteId
+    ) {
 
         return usuarioRepository
                 .findByCliente_Id(clienteId)
@@ -212,13 +273,16 @@ public class RegistroClienteServiceImpl implements RegistroClienteService {
 
     private AdminClienteResponse convertirRespuesta(
             Cliente cliente,
-            Usuario usuario) {
+            Usuario usuario
+    ) {
 
         return new AdminClienteResponse(
                 cliente.getId(),
                 cliente.getNombre(),
                 cliente.getEmail(),
                 cliente.getEmpresa(),
+                cliente.getArea(),
+                cliente.getTelefono(),
                 cliente.getFechaCreacion(),
                 usuario.isActivo()
         );

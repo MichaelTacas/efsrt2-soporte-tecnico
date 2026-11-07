@@ -1,16 +1,7 @@
 package com.idat.soportetecnico.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import jakarta.persistence.PrePersist;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,29 +12,32 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "El nombre es obligatorio")
-    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     @Column(nullable = false, length = 100)
     private String nombre;
 
-    @NotBlank(message = "El email es obligatorio")
-    @Email(message = "El email debe tener un formato válido")
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @NotBlank(message = "La empresa es obligatoria")
-    @Size(max = 100, message = "La empresa no puede superar los 100 caracteres")
     @Column(nullable = false, length = 100)
     private String empresa;
+
+    @Column(nullable = false, length = 100)
+    private String area;
+
+    @Column(nullable = false, length = 20)
+    private String telefono;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime fechaCreacion;
 
     public Cliente() {
     }
 
-    public Cliente(Long id, String nombre, String email, String empresa) {
-        this.id = id;
-        this.nombre = nombre;
-        this.email = email;
-        this.empresa = empresa;
+    @PrePersist
+    public void prePersist() {
+        if (fechaCreacion == null) {
+            fechaCreacion = LocalDateTime.now();
+        }
     }
 
     public Long getId() {
@@ -78,6 +72,22 @@ public class Cliente {
         this.empresa = empresa;
     }
 
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
     public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
     }
@@ -85,15 +95,4 @@ public class Cliente {
     public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime fechaCreacion;
-
-    @PrePersist
-    public void prePersist() {
-        if (fechaCreacion == null) {
-            fechaCreacion = LocalDateTime.now();
-        }
-    }
 }
-

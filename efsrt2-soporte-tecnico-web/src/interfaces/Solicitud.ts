@@ -4,13 +4,17 @@ export interface Solicitud {
     titulo: string;
     descripcion: string;
 
-    prioridad: "BAJA" | "MEDIA" | "ALTA";
+    prioridad:
+        | "BAJA"
+        | "MEDIA"
+        | "ALTA";
 
     gravedad:
         | "LEVE"
         | "MODERADA"
         | "GRAVE"
-        | "CRITICA";
+        | "CRITICA"
+        | null;
 
     estado:
         | "PENDIENTE"
@@ -18,11 +22,27 @@ export interface Solicitud {
         | "RESUELTA"
         | "CERRADA";
 
+    // =========================================
+    // CLIENTE
+    // =========================================
+
     clienteId: number;
     clienteNombre: string;
 
+    clienteEmpresa: string;
+    clienteArea: string;
+    clienteTelefono: string;
+
+    // =========================================
+    // TÉCNICO
+    // =========================================
+
     tecnicoId: number | null;
     tecnicoNombre: string | null;
+
+    // =========================================
+    // FECHAS
+    // =========================================
 
     fechaCreacion: string | null;
     fechaLimite: string | null;

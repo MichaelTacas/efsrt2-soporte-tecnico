@@ -24,14 +24,6 @@ function ClienteSolicitudForm({
             "MEDIA"
         );
 
-    const [gravedad, setGravedad] =
-        useState<
-            "LEVE" |
-            "MODERADA" |
-            "GRAVE" |
-            "CRITICA"
-        >("MODERADA");
-
     const [enviando, setEnviando] =
         useState(false);
 
@@ -48,13 +40,10 @@ function ClienteSolicitudForm({
 
         event.preventDefault();
 
-        const nuevaSolicitud:
-            ClienteSolicitudRequest = {
-
+        const nuevaSolicitud: ClienteSolicitudRequest = {
             titulo,
             descripcion,
-            prioridad,
-            gravedad
+            prioridad
         };
 
         try {
@@ -69,7 +58,6 @@ function ClienteSolicitudForm({
             setTitulo("");
             setDescripcion("");
             setPrioridad("MEDIA");
-            setGravedad("MODERADA");
 
             setMensaje(
                 "Solicitud registrada correctamente"
@@ -201,48 +189,6 @@ function ClienteSolicitudForm({
                         placeholder="Describe detalladamente el problema presentado..."
                         required
                     />
-
-                </div>
-
-                {/* GRAVEDAD */}
-
-                <div className="form-group">
-
-                    <label htmlFor="gravedad">
-                        Gravedad
-                    </label>
-
-                    <select
-                        id="gravedad"
-                        value={gravedad}
-                        onChange={(event) =>
-                            setGravedad(
-                                event.target.value as
-                                    | "LEVE"
-                                    | "MODERADA"
-                                    | "GRAVE"
-                                    | "CRITICA"
-                            )
-                        }
-                    >
-
-                        <option value="LEVE">
-                            Leve
-                        </option>
-
-                        <option value="MODERADA">
-                            Moderada
-                        </option>
-
-                        <option value="GRAVE">
-                            Grave
-                        </option>
-
-                        <option value="CRITICA">
-                            Crítica
-                        </option>
-
-                    </select>
 
                 </div>
 

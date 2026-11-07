@@ -29,40 +29,106 @@ public class SolicitudMapper {
         return solicitud;
     }
 
-    public SolicitudResponse toResponse(Solicitud solicitud) {
+    public SolicitudResponse toResponse(
+            Solicitud solicitud
+    ) {
 
-        SolicitudResponse response = new SolicitudResponse();
+        SolicitudResponse response =
+                new SolicitudResponse();
 
-        response.setId(solicitud.getId());
-        response.setTitulo(solicitud.getTitulo());
-        response.setDescripcion(solicitud.getDescripcion());
-        response.setPrioridad(solicitud.getPrioridad());
-        response.setEstado(solicitud.getEstado());
-        response.setGravedad(solicitud.getGravedad());
+        response.setId(
+                solicitud.getId()
+        );
 
-        response.setFechaCreacion(solicitud.getFechaCreacion());
-        response.setFechaLimite(solicitud.getFechaLimite());
-        response.setFechaInicioAtencion(solicitud.getFechaInicioAtencion());
-        response.setFechaResolucion(solicitud.getFechaResolucion());
-        response.setFechaCierre(solicitud.getFechaCierre());
+        response.setTitulo(
+                solicitud.getTitulo()
+        );
+
+        response.setDescripcion(
+                solicitud.getDescripcion()
+        );
+
+        response.setPrioridad(
+                solicitud.getPrioridad()
+        );
+
+        response.setEstado(
+                solicitud.getEstado()
+        );
+
+        response.setGravedad(
+                solicitud.getGravedad()
+        );
+
+        // =========================================
+        // FECHAS
+        // =========================================
+
+        response.setFechaCreacion(
+                solicitud.getFechaCreacion()
+        );
+
+        response.setFechaLimite(
+                solicitud.getFechaLimite()
+        );
+
+        response.setFechaInicioAtencion(
+                solicitud.getFechaInicioAtencion()
+        );
+
+        response.setFechaResolucion(
+                solicitud.getFechaResolucion()
+        );
+
+        response.setFechaCierre(
+                solicitud.getFechaCierre()
+        );
+
+        // =========================================
+        // CLIENTE
+        // =========================================
 
         if (solicitud.getCliente() != null) {
+
+            Cliente cliente =
+                    solicitud.getCliente();
+
             response.setClienteId(
-                    solicitud.getCliente().getId()
+                    cliente.getId()
             );
 
             response.setClienteNombre(
-                    solicitud.getCliente().getNombre()
+                    cliente.getNombre()
+            );
+
+            response.setClienteEmpresa(
+                    cliente.getEmpresa()
+            );
+
+            response.setClienteArea(
+                    cliente.getArea()
+            );
+
+            response.setClienteTelefono(
+                    cliente.getTelefono()
             );
         }
 
+        // =========================================
+        // TÉCNICO
+        // =========================================
+
         if (solicitud.getTecnico() != null) {
+
+            Tecnico tecnico =
+                    solicitud.getTecnico();
+
             response.setTecnicoId(
-                    solicitud.getTecnico().getId()
+                    tecnico.getId()
             );
 
             response.setTecnicoNombre(
-                    solicitud.getTecnico().getNombre()
+                    tecnico.getNombre()
             );
         }
 

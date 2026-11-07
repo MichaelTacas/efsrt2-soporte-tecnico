@@ -362,3 +362,91 @@
         grid-template-columns: 1fr;
     }
 }
+
+.btn-clasificar {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-clasificar:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+.btn-clasificar:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-clasificar {
+    border: 1px solid #4f8cff;
+    background: transparent;
+    color: #4f8cff;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-clasificar:hover {
+    background: rgba(79, 140, 255, 0.12);
+}
+
+.clasificacion-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.clasificacion-incidente {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.clasificacion-incidente strong {
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.clasificacion-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.clasificacion-info-grid > div {
+    min-width: 0;
+}
+
+.clasificacion-info-grid p {
+    margin: 4px 0 0;
+    word-break: break-word;
+}
+
+.clasificacion-descripcion {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.clasificacion-descripcion p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+    .clasificacion-info-grid {
+        grid-template-columns: 1fr;
+    }
+}

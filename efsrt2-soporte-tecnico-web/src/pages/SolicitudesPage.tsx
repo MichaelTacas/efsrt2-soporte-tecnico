@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import SolicitudForm from "../components/SolicitudForm";
 import SolicitudEstadoAction from "../components/SolicitudEstadoAction";
 import SolicitudDetalleModal from "../components/SolicitudDetalleModal";
+import ClasificarSolicitudModal from "../components/ClasificarSolicitudModal";
 
 import type { Solicitud } from "../interfaces/Solicitud";
 import type { SolicitudRequest } from "../interfaces/SolicitudRequest";
@@ -26,6 +27,11 @@ export default function SolicitudesPage() {
     const [
         solicitudSeleccionada,
         setSolicitudSeleccionada
+    ] = useState<Solicitud | null>(null);
+
+    const [
+        solicitudAClasificar,
+        setSolicitudAClasificar
     ] = useState<Solicitud | null>(null);
 
     // =========================================
@@ -93,6 +99,35 @@ export default function SolicitudesPage() {
     };
 
     // =========================================
+    // ACTUALIZAR SOLICITUD CLASIFICADA
+    // =========================================
+
+    const actualizarSolicitudClasificada = (
+        solicitudActualizada: Solicitud
+    ) => {
+
+        setSolicitudes(
+            (solicitudesActuales) =>
+                solicitudesActuales.map(
+                    (solicitud) =>
+                        solicitud.id ===
+                        solicitudActualizada.id
+                            ? solicitudActualizada
+                            : solicitud
+                )
+        );
+
+        if (
+            solicitudSeleccionada?.id ===
+            solicitudActualizada.id
+        ) {
+            setSolicitudSeleccionada(
+                solicitudActualizada
+            );
+        }
+    };
+
+    // =========================================
     // CAMBIAR ESTADO
     // =========================================
 
@@ -143,8 +178,6 @@ export default function SolicitudesPage() {
                     )
             );
 
-            // Si el modal está abierto,
-            // actualizamos también su información.
             if (
                 solicitudSeleccionada?.id ===
                 solicitudActualizada.id
@@ -343,25 +376,25 @@ export default function SolicitudesPage() {
 
                                             <td>
 
-                                            <span
-                                                className={`prioridad prioridad-${solicitud.prioridad.toLowerCase()}`}
-                                            >
-                                                {
-                                                    solicitud.prioridad
-                                                }
-                                            </span>
+                                                    <span
+                                                        className={`prioridad prioridad-${solicitud.prioridad.toLowerCase()}`}
+                                                    >
+                                                        {
+                                                            solicitud.prioridad
+                                                        }
+                                                    </span>
 
                                             </td>
 
                                             <td>
 
-                                            <span
-                                                className={`estado estado-${solicitud.estado.toLowerCase()}`}
-                                            >
-                                                {
-                                                    solicitud.estado
-                                                }
-                                            </span>
+                                                    <span
+                                                        className={`estado estado-${solicitud.estado.toLowerCase()}`}
+                                                    >
+                                                        {
+                                                            solicitud.estado
+                                                        }
+                                                    </span>
 
                                             </td>
 
@@ -381,6 +414,27 @@ export default function SolicitudesPage() {
                                                         Ver detalle
                                                     </button>
 
+                                                    {esAdministrador &&
+                                                        solicitud.estado === "PENDIENTE" &&
+                                                        (
+                                                            solicitud.gravedad == null ||
+                                                            solicitud.tecnicoId == null
+                                                        ) && (
+
+                                                            <button
+                                                                type="button"
+                                                                className="btn-clasificar"
+                                                                onClick={() =>
+                                                                    setSolicitudAClasificar(
+                                                                        solicitud
+                                                                    )
+                                                                }
+                                                            >
+                                                                Clasificar
+                                                            </button>
+
+                                                        )}
+
                                                     <SolicitudEstadoAction
                                                         solicitud={
                                                             solicitud
@@ -396,7 +450,8 @@ export default function SolicitudesPage() {
 
                                         </tr>
 
-                                    ))}
+                                    )
+                                )}
 
                                 </tbody>
 
@@ -422,6 +477,28 @@ export default function SolicitudesPage() {
                         setSolicitudSeleccionada(
                             null
                         )
+                    }
+                />
+
+            )}
+
+            {/* =====================================
+                CLASIFICAR SOLICITUD
+            ====================================== */}
+
+            {solicitudAClasificar && (
+
+                <ClasificarSolicitudModal
+                    solicitud={
+                        solicitudAClasificar
+                    }
+                    onCerrar={() =>
+                        setSolicitudAClasificar(
+                            null
+                        )
+                    }
+                    onClasificada={
+                        actualizarSolicitudClasificada
                     }
                 />
 

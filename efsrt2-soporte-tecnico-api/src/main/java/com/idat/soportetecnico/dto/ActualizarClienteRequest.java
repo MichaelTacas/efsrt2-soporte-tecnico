@@ -15,6 +15,12 @@ public class ActualizarClienteRequest {
     @NotBlank(message = "La empresa es obligatoria")
     private String empresa;
 
+    @NotBlank(message = "El área es obligatoria")
+    private String area;
+
+    @NotBlank(message = "El teléfono es obligatorio")
+    private String telefono;
+
     public String getNombre() {
         return nombre;
     }
@@ -37,5 +43,21 @@ public class ActualizarClienteRequest {
 
     public void setEmpresa(String empresa) {
         this.empresa = empresa;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 }

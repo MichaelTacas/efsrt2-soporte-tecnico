@@ -30,11 +30,28 @@ export default function SolicitudDetalleModal({
         );
     };
 
+    const mostrarFechaLimite = () => {
+
+        if (!solicitud.fechaLimite) {
+
+            if (!solicitud.gravedad) {
+                return "Pendiente de clasificación";
+            }
+
+            return "Sin registrar";
+        }
+
+        return formatearFecha(
+            solicitud.fechaLimite
+        );
+    };
+
     return (
         <div
             className="modal-overlay"
             onClick={onCerrar}
         >
+
             <div
                 className="modal-detalle"
                 onClick={(event) =>
@@ -42,9 +59,12 @@ export default function SolicitudDetalleModal({
                 }
             >
 
+                {/* ENCABEZADO */}
+
                 <div className="modal-header">
 
                     <div>
+
                         <h2>
                             Detalle de solicitud #{solicitud.id}
                         </h2>
@@ -52,6 +72,7 @@ export default function SolicitudDetalleModal({
                         <p>
                             Información completa de la incidencia
                         </p>
+
                     </div>
 
                     <button
@@ -63,6 +84,8 @@ export default function SolicitudDetalleModal({
                     </button>
 
                 </div>
+
+                {/* INCIDENTE */}
 
                 <div className="detalle-incidente">
 
@@ -76,6 +99,8 @@ export default function SolicitudDetalleModal({
 
                 </div>
 
+                {/* DESCRIPCIÓN */}
+
                 <div className="detalle-descripcion">
 
                     <span className="detalle-label">
@@ -88,33 +113,51 @@ export default function SolicitudDetalleModal({
 
                 </div>
 
+                {/* DATOS GENERALES */}
+
                 <div className="detalle-grid">
 
                     <div>
+
                         <span className="detalle-label">
                             Prioridad
                         </span>
 
-                        <p>{solicitud.prioridad}</p>
+                        <p>
+                            {solicitud.prioridad}
+                        </p>
+
                     </div>
 
                     <div>
+
                         <span className="detalle-label">
                             Gravedad
                         </span>
 
-                        <p>{solicitud.gravedad}</p>
+                        <p>
+                            {solicitud.gravedad ??
+                                "Pendiente de clasificación"}
+                        </p>
+
                     </div>
 
                     <div>
+
                         <span className="detalle-label">
                             Estado
                         </span>
 
-                        <p>{solicitud.estado}</p>
+                        <p>
+                            {solicitud.estado}
+                        </p>
+
                     </div>
 
+                    {/* CLIENTE */}
+
                     <div>
+
                         <span className="detalle-label">
                             Cliente
                         </span>
@@ -122,9 +165,52 @@ export default function SolicitudDetalleModal({
                         <p>
                             {solicitud.clienteNombre}
                         </p>
+
                     </div>
 
                     <div>
+
+                        <span className="detalle-label">
+                            Empresa
+                        </span>
+
+                        <p>
+                            {solicitud.clienteEmpresa ||
+                                "Sin registrar"}
+                        </p>
+
+                    </div>
+
+                    <div>
+
+                        <span className="detalle-label">
+                            Área
+                        </span>
+
+                        <p>
+                            {solicitud.clienteArea ||
+                                "Sin registrar"}
+                        </p>
+
+                    </div>
+
+                    <div>
+
+                        <span className="detalle-label">
+                            Teléfono
+                        </span>
+
+                        <p>
+                            {solicitud.clienteTelefono ||
+                                "Sin registrar"}
+                        </p>
+
+                    </div>
+
+                    {/* TÉCNICO */}
+
+                    <div>
+
                         <span className="detalle-label">
                             Técnico
                         </span>
@@ -133,9 +219,13 @@ export default function SolicitudDetalleModal({
                             {solicitud.tecnicoNombre ??
                                 "Sin asignar"}
                         </p>
+
                     </div>
 
+                    {/* FECHAS */}
+
                     <div>
+
                         <span className="detalle-label">
                             Fecha de creación
                         </span>
@@ -145,21 +235,23 @@ export default function SolicitudDetalleModal({
                                 solicitud.fechaCreacion
                             )}
                         </p>
+
                     </div>
 
                     <div>
+
                         <span className="detalle-label">
                             Fecha límite
                         </span>
 
                         <p>
-                            {formatearFecha(
-                                solicitud.fechaLimite
-                            )}
+                            {mostrarFechaLimite()}
                         </p>
+
                     </div>
 
                     <div>
+
                         <span className="detalle-label">
                             Inicio de atención
                         </span>
@@ -169,9 +261,11 @@ export default function SolicitudDetalleModal({
                                 solicitud.fechaInicioAtencion
                             )}
                         </p>
+
                     </div>
 
                     <div>
+
                         <span className="detalle-label">
                             Fecha de solución
                         </span>
@@ -181,9 +275,11 @@ export default function SolicitudDetalleModal({
                                 solicitud.fechaResolucion
                             )}
                         </p>
+
                     </div>
 
                     <div>
+
                         <span className="detalle-label">
                             Fecha de cierre
                         </span>
@@ -193,9 +289,12 @@ export default function SolicitudDetalleModal({
                                 solicitud.fechaCierre
                             )}
                         </p>
+
                     </div>
 
                 </div>
+
+                {/* ACCIONES */}
 
                 <div className="modal-actions">
 
@@ -210,6 +309,7 @@ export default function SolicitudDetalleModal({
                 </div>
 
             </div>
+
         </div>
     );
 }
