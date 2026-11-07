@@ -2,7 +2,7 @@
 
 Proyecto académico desarrollado para el curso **Proyecto Integración de los Componentes de las Capas de Datos, Negocio y Vista**.
 
-El sistema permite gestionar solicitudes de soporte técnico mediante una aplicación web basada en una arquitectura por capas, integrando frontend, backend, lógica de negocio, persistencia, autenticación y autorización por roles.
+El sistema permite gestionar solicitudes de soporte técnico mediante una aplicación web basada en una arquitectura por capas, integrando frontend, backend, lógica de negocio, persistencia, autenticación, autorización por roles y seguimiento del ciclo completo de atención de incidencias.
 
 ## Integrantes
 
@@ -46,6 +46,7 @@ El sistema permite gestionar solicitudes de soporte técnico mediante una aplica
 ## Base de datos
 
 - MySQL
+- MySQL Workbench
 
 ---
 
@@ -77,19 +78,18 @@ El sistema utiliza una arquitectura organizada por capas:
 Vista / Frontend
 React + TypeScript
         ↓
-Autenticación
-JWT
+Autenticación / JWT
         ↓
-API / Controller
+API / Controllers
 Spring Boot
         ↓
-Application Service
+Application Services
         ↓
 Lógica de negocio
-Service + Validators
+Services + Validators
         ↓
 Acceso a datos
-Repository + JPA / Hibernate
+Repositories + JPA / Hibernate
         ↓
 Base de datos
 MySQL
@@ -99,35 +99,228 @@ Esta organización permite separar las responsabilidades de la interfaz, segurid
 
 ---
 
+# Roles del sistema
+
+El sistema trabaja actualmente con tres roles:
+
+```text
+ADMINISTRADOR
+TECNICO
+CLIENTE
+```
+
+Cada rol tiene funciones y permisos diferentes.
+
+---
+
+## ADMINISTRADOR
+
+El administrador puede:
+
+- Iniciar sesión.
+- Registrar solicitudes.
+- Consultar todas las solicitudes.
+- Seleccionar clientes.
+- Asignar técnicos.
+- Consultar técnicos disponibles.
+- Registrar y administrar clientes.
+- Activar o desactivar cuentas de clientes.
+- Restablecer contraseñas de clientes.
+- Consultar el detalle completo de los tickets.
+- Cerrar solicitudes que se encuentren resueltas.
+- Acceder a operaciones administrativas protegidas.
+
+En el frontend dispone del formulario de registro de solicitudes y del listado general del sistema.
+
+---
+
+## TECNICO
+
+El técnico puede:
+
+- Iniciar sesión.
+- Consultar únicamente las solicitudes que tiene asignadas.
+- Consultar el detalle completo de cada ticket.
+- Iniciar la atención de una solicitud.
+- Cambiar una solicitud de `PENDIENTE` a `EN_PROCESO`.
+- Marcar una solicitud como resuelta.
+- Cambiar una solicitud de `EN_PROCESO` a `RESUELTA`.
+
+El técnico no puede:
+
+- Registrar solicitudes como administrador.
+- Crear clientes.
+- Administrar usuarios.
+- Crear o eliminar técnicos.
+- Cerrar una solicitud resuelta.
+- Consultar solicitudes asignadas a otros técnicos mediante su endpoint específico.
+
+---
+
+## CLIENTE
+
+El cliente puede:
+
+- Crear una cuenta desde el registro público.
+- Iniciar sesión.
+- Registrar nuevas solicitudes de soporte.
+- Consultar únicamente sus propias solicitudes.
+- Consultar el detalle completo de sus tickets.
+- Visualizar el técnico asignado.
+- Consultar prioridad, gravedad, estado y fechas de seguimiento.
+
+El cliente no puede:
+
+- Seleccionar otro cliente.
+- Elegir un técnico.
+- Modificar directamente el estado.
+- Cerrar solicitudes.
+- Acceder a funciones administrativas.
+
+El registro público siempre crea usuarios con:
+
+```text
+rol = CLIENTE
+activo = true
+```
+
+El usuario no puede seleccionar libremente los roles `ADMINISTRADOR` o `TECNICO`.
+
+---
+
+# Registro público de clientes
+
+Desde la pantalla de inicio de sesión se encuentra disponible la opción:
+
+```text
+¿No tienes una cuenta?
+Crear cuenta
+```
+
+El formulario solicita:
+
+```text
+Nombre completo
+Correo electrónico
+Empresa
+Contraseña
+Confirmar contraseña
+```
+
+El frontend envía los datos a:
+
+```http
+POST /api/auth/registro
+```
+
+El backend crea:
+
+```text
+Cliente
+   +
+Usuario
+   +
+Rol CLIENTE
+```
+
+La contraseña es almacenada mediante BCrypt y nunca en texto plano.
+
+---
+
 # Funcionalidades principales
 
-El sistema permite:
+Actualmente el sistema permite:
 
 - Registrar clientes.
 - Registrar y administrar técnicos.
 - Consultar técnicos disponibles.
 - Registrar solicitudes de soporte.
-- Asignar prioridades.
+- Registrar solicitudes desde una cuenta CLIENTE.
+- Asignar prioridad.
+- Asignar gravedad.
 - Asignar técnicos.
-- Listar solicitudes.
+- Consultar solicitudes.
 - Consultar solicitudes por estado.
 - Consultar solicitudes por prioridad.
+- Consultar solicitudes propias del cliente.
+- Consultar solicitudes asignadas al técnico.
 - Cambiar el estado de las solicitudes.
 - Validar disponibilidad del técnico.
 - Validar transiciones entre estados.
+- Calcular automáticamente la fecha límite.
+- Registrar automáticamente las fechas del ciclo de atención.
+- Consultar el detalle completo de un ticket.
 - Iniciar sesión mediante correo y contraseña.
+- Registrar nuevos clientes desde la web.
 - Generar tokens JWT.
 - Proteger endpoints mediante Spring Security.
 - Diferenciar permisos según el rol.
-- Mostrar interfaces diferentes para administrador y técnico.
+- Mostrar interfaces diferentes para administrador, técnico y cliente.
 - Cerrar sesión.
 - Validar permisos para cambios de estado.
 
 ---
 
-# Flujo de estados
+# Prioridad y gravedad
 
-Las solicitudes utilizan los siguientes estados:
+Las solicitudes manejan dos conceptos independientes.
+
+## Prioridad
+
+Representa la importancia u orden de atención:
+
+```text
+BAJA
+MEDIA
+ALTA
+```
+
+## Gravedad
+
+Representa el impacto técnico de la incidencia:
+
+```text
+LEVE
+MODERADA
+GRAVE
+CRITICA
+```
+
+La gravedad determina automáticamente el plazo máximo de atención.
+
+| Gravedad | Tiempo máximo |
+|---|---:|
+| LEVE | 48 horas |
+| MODERADA | 24 horas |
+| GRAVE | 12 horas |
+| CRITICA | 4 horas |
+
+Ejemplo:
+
+```text
+Fecha de creación:
+06/11/2026 05:10 p. m.
+
+Gravedad:
+GRAVE
+
+Fecha límite:
+07/11/2026 05:10 a. m.
+```
+
+La fecha límite no se ingresa manualmente desde el frontend.
+
+---
+
+# Ciclo de atención del ticket
+
+Toda solicitud nueva inicia en:
+
+```text
+PENDIENTE
+```
+
+El ciclo completo es:
 
 ```text
 PENDIENTE
@@ -139,29 +332,31 @@ RESUELTA
 CERRADA
 ```
 
-El flujo operativo según el rol es:
+El flujo operativo por rol es:
 
 ```text
-ADMINISTRADOR
-      ↓
+CLIENTE / ADMINISTRADOR
+        ↓
 Registra solicitud
-      ↓
+        ↓
 PENDIENTE
 
 TÉCNICO
-      ↓
-Inicia atención
-      ↓
+        ↓
+Iniciar atención
+        ↓
 EN_PROCESO
-      ↓
-Marca como resuelta
-      ↓
+
+TÉCNICO
+        ↓
+Marcar resuelta
+        ↓
 RESUELTA
 
 ADMINISTRADOR
-      ↓
-Cierra solicitud
-      ↓
+        ↓
+Cerrar solicitud
+        ↓
 CERRADA
 ```
 
@@ -173,53 +368,245 @@ PENDIENTE → CERRADA
 
 ---
 
-# Roles del sistema
+# Fechas de seguimiento
 
-## ADMINISTRADOR
-
-El administrador puede:
-
-- Iniciar sesión.
-- Registrar solicitudes.
-- Consultar solicitudes.
-- Asignar clientes.
-- Asignar técnicos.
-- Administrar usuarios desde la API.
-- Registrar, modificar y eliminar clientes.
-- Registrar, modificar y eliminar técnicos.
-- Eliminar solicitudes.
-- Cerrar solicitudes que se encuentren resueltas.
-
-En el frontend, el administrador visualiza el formulario:
+Cada solicitud puede contener:
 
 ```text
-Registrar nueva solicitud
+fechaCreacion
+fechaLimite
+fechaInicioAtencion
+fechaResolucion
+fechaCierre
 ```
 
-y la lista general de solicitudes registradas.
+## Fecha de creación
+
+Se genera automáticamente al registrar el ticket.
+
+## Fecha límite
+
+Se calcula automáticamente en función de la gravedad.
+
+## Inicio de atención
+
+Se registra cuando el técnico presiona:
+
+```text
+Iniciar atención
+```
+
+La solicitud cambia:
+
+```text
+PENDIENTE → EN_PROCESO
+```
+
+## Fecha de solución
+
+Se registra cuando el técnico presiona:
+
+```text
+Marcar resuelta
+```
+
+La solicitud cambia:
+
+```text
+EN_PROCESO → RESUELTA
+```
+
+## Fecha de cierre
+
+Se registra cuando el administrador cierra oficialmente la solicitud:
+
+```text
+RESUELTA → CERRADA
+```
+
+Estas fechas permiten determinar posteriormente indicadores como:
+
+- Tiempo de respuesta.
+- Tiempo de solución.
+- Solicitudes resueltas dentro del plazo.
+- Solicitudes resueltas fuera del plazo.
 
 ---
 
-## TÉCNICO
+# Ver detalle del ticket
 
-El técnico puede:
+Las vistas utilizan tablas resumidas para evitar mostrar demasiada información simultáneamente.
 
-- Iniciar sesión.
-- Consultar solicitudes.
-- Iniciar la atención de una solicitud.
-- Cambiar una solicitud de `PENDIENTE` a `EN_PROCESO`.
-- Cambiar una solicitud de `EN_PROCESO` a `RESUELTA`.
+Cada solicitud dispone de la opción:
 
-El técnico no puede:
+```text
+Ver detalle
+```
 
-- Registrar solicitudes.
-- Administrar usuarios.
-- Crear, modificar o eliminar clientes.
-- Crear, modificar o eliminar técnicos.
-- Eliminar solicitudes.
-- Cambiar una solicitud de `RESUELTA` a `CERRADA`.
+El detalle muestra:
 
-En el frontend, el técnico visualiza únicamente las solicitudes y las acciones relacionadas con su atención.
+```text
+Incidente
+Descripción
+Cliente
+Técnico
+Prioridad
+Gravedad
+Estado
+Fecha de creación
+Fecha límite
+Inicio de atención
+Fecha de solución
+Fecha de cierre
+```
+
+El componente reutilizable utilizado es:
+
+```text
+SolicitudDetalleModal.tsx
+```
+
+---
+
+# Vista del administrador
+
+El administrador visualiza:
+
+```text
+Sistema de Soporte Técnico
+Gestión y seguimiento de incidencias
+
+Registrar nueva solicitud
+
+Solicitudes registradas
+```
+
+La tabla principal muestra información resumida:
+
+```text
+ID
+Incidente
+Cliente
+Técnico
+Prioridad
+Estado
+Acciones
+```
+
+Acciones posibles:
+
+```text
+PENDIENTE
+→ Ver detalle
+→ Pendiente de atención
+
+EN_PROCESO
+→ Ver detalle
+→ En atención
+
+RESUELTA
+→ Ver detalle
+→ Cerrar solicitud
+
+CERRADA
+→ Ver detalle
+→ Finalizada
+```
+
+---
+
+# Vista del técnico
+
+El técnico visualiza únicamente las solicitudes que tiene asignadas.
+
+La tabla contiene:
+
+```text
+ID
+Incidente
+Cliente
+Prioridad
+Gravedad
+Estado
+Fecha límite
+Acciones
+```
+
+Acciones:
+
+```text
+PENDIENTE
+→ Ver detalle
+→ Iniciar atención
+
+EN_PROCESO
+→ Ver detalle
+→ Marcar resuelta
+
+RESUELTA
+→ Ver detalle
+→ Pendiente de cierre
+
+CERRADA
+→ Ver detalle
+→ Finalizada
+```
+
+El técnico no puede cerrar una solicitud.
+
+---
+
+# Vista del cliente
+
+El cliente dispone de:
+
+```text
+Portal de Soporte
+
+Nueva solicitud
+
+Mis solicitudes
+```
+
+Al crear una solicitud completa únicamente:
+
+```text
+Incidente
+Descripción
+Prioridad
+Gravedad
+```
+
+El backend obtiene automáticamente el cliente a partir del usuario autenticado.
+
+No se solicita:
+
+```text
+clienteId
+tecnicoId
+estado
+fechas
+```
+
+La tabla del cliente muestra:
+
+```text
+ID
+Incidente
+Prioridad
+Estado
+Técnico
+Creación
+Acción
+```
+
+Y mediante:
+
+```text
+Ver detalle
+```
+
+puede consultar toda la información del ticket.
 
 ---
 
@@ -234,9 +621,11 @@ El sistema implementa seguridad mediante:
 - Sesiones stateless.
 - Bearer Token.
 - Protección de endpoints.
-- Validaciones adicionales de permisos en la lógica de negocio.
+- Validaciones de permisos en backend.
 
-El flujo de autenticación es:
+---
+
+# Flujo de autenticación
 
 ```text
 Usuario
@@ -279,23 +668,48 @@ agrega automáticamente el JWT a las peticiones protegidas.
 
 ---
 
+# Seguridad por rutas
+
+La configuración de seguridad diferencia los módulos por rol:
+
+```text
+/api/admin/**
+→ ADMINISTRADOR
+
+/api/tecnico/**
+→ TECNICO
+
+/api/cliente/**
+→ CLIENTE
+```
+
+Los siguientes endpoints son públicos:
+
+```text
+POST /api/auth/login
+POST /api/auth/registro
+```
+
+---
+
 # Validaciones de seguridad por rol
 
-Entre las principales reglas se encuentran:
+| Operación | Administrador | Técnico | Cliente |
+|---|---:|---:|---:|
+| Iniciar sesión | Sí | Sí | Sí |
+| Registrarse públicamente | No aplica | No aplica | Sí |
+| Consultar todas las solicitudes | Sí | No | No |
+| Consultar solicitudes asignadas | Sí | Sí | No |
+| Consultar solicitudes propias | Sí | No | Sí |
+| Registrar solicitud | Sí | No | Sí |
+| Seleccionar cliente | Sí | No | No |
+| Asignar técnico | Sí | No | No |
+| Iniciar atención | No | Sí | No |
+| Marcar resuelta | No | Sí | No |
+| Cerrar solicitud resuelta | Sí | No | No |
+| Administrar clientes | Sí | No | No |
 
-| Operación | Administrador | Técnico |
-|---|---:|---:|
-| Iniciar sesión | Sí | Sí |
-| Consultar solicitudes | Sí | Sí |
-| Registrar solicitud | Sí | No |
-| Actualizar solicitudes permitidas | Sí | Sí |
-| Eliminar solicitud | Sí | No |
-| Administrar usuarios | Sí | No |
-| Registrar clientes | Sí | No |
-| Registrar técnicos | Sí | No |
-| Cerrar solicitud resuelta | Sí | No |
-
-Cuando un usuario no se encuentra autenticado correctamente, la API puede responder:
+Cuando un usuario no se encuentra autenticado correctamente:
 
 ```text
 401 Unauthorized
@@ -332,8 +746,6 @@ PENDIENTE → CERRADA ❌
 
 Comprueba si el usuario autenticado tiene permiso para realizar determinados cambios de estado.
 
-Regla principal:
-
 ```text
 TÉCNICO
 RESUELTA → CERRADA ❌
@@ -342,17 +754,168 @@ ADMINISTRADOR
 RESUELTA → CERRADA ✅
 ```
 
-Esto evita que un técnico pueda cerrar una solicitud directamente mediante Swagger, Postman u otra herramienta externa.
+---
+
+# Servicios de fecha límite
+
+La lógica para calcular el vencimiento de una solicitud está separada mediante:
+
+```text
+FechaLimiteService
+FechaLimiteServiceImpl
+```
+
+Esta separación permite que la entidad `Solicitud` almacene la información mientras el servicio especializado aplica la regla de cálculo.
 
 ---
 
-# 1. Preparar la base de datos
+# Frontend
 
-Abrir MySQL Workbench y ejecutar:
+Entre los principales componentes y páginas se encuentran:
 
 ```text
-database/setup.sql
+src
+├── components
+│   ├── AppHeader.tsx
+│   ├── SolicitudForm.tsx
+│   ├── ClienteSolicitudForm.tsx
+│   ├── SolicitudEstadoAction.tsx
+│   └── SolicitudDetalleModal.tsx
+│
+├── pages
+│   ├── LoginPage.tsx
+│   ├── RegistroPage.tsx
+│   ├── SolicitudesPage.tsx
+│   ├── TecnicoSolicitudesPage.tsx
+│   └── ClienteSolicitudesPage.tsx
+│
+├── services
+│   ├── apiClient.ts
+│   ├── authService.ts
+│   ├── solicitudService.ts
+│   ├── tecnicoSolicitudService.ts
+│   ├── clienteSolicitudService.ts
+│   ├── registroService.ts
+│   ├── clienteService.ts
+│   └── tecnicoService.ts
+│
+└── interfaces
 ```
+
+---
+
+# Servicios frontend por rol
+
+## Administrador
+
+```text
+solicitudService.ts
+```
+
+Consume principalmente:
+
+```text
+/api/solicitudes
+```
+
+## Técnico
+
+```text
+tecnicoSolicitudService.ts
+```
+
+Consume:
+
+```text
+/api/tecnico/solicitudes
+```
+
+## Cliente
+
+```text
+clienteSolicitudService.ts
+```
+
+Consume:
+
+```text
+/api/cliente/solicitudes
+```
+
+## Registro público
+
+```text
+registroService.ts
+```
+
+Consume:
+
+```text
+/api/auth/registro
+```
+
+---
+
+# API principal
+
+## Autenticación
+
+```http
+POST /api/auth/login
+POST /api/auth/registro
+```
+
+## Administración de clientes
+
+```http
+GET   /api/admin/clientes
+POST  /api/admin/clientes
+PUT   /api/admin/clientes/{id}
+PATCH /api/admin/clientes/{id}/estado
+PATCH /api/admin/clientes/{id}/password
+```
+
+## Solicitudes del administrador
+
+```http
+GET  /api/solicitudes
+POST /api/solicitudes
+PUT  /api/solicitudes/{id}
+```
+
+Consultas:
+
+```http
+GET /api/solicitudes/estado/{estado}
+GET /api/solicitudes/prioridad/{prioridad}
+```
+
+## Solicitudes del técnico
+
+```http
+GET   /api/tecnico/solicitudes
+PATCH /api/tecnico/solicitudes/{id}/iniciar
+PATCH /api/tecnico/solicitudes/{id}/resolver
+```
+
+## Solicitudes del cliente
+
+```http
+GET  /api/cliente/solicitudes
+POST /api/cliente/solicitudes
+```
+
+## Técnicos
+
+```http
+GET  /api/tecnicos
+POST /api/tecnicos
+GET  /api/tecnicos/disponibles
+```
+
+---
+
+# Base de datos
 
 La base de datos utilizada es:
 
@@ -369,7 +932,42 @@ solicitudes
 usuarios
 ```
 
-Las contraseñas de los usuarios son almacenadas mediante hash BCrypt y no en texto plano.
+La entidad `Usuario` permite relacionar la cuenta autenticada con un cliente o técnico.
+
+Ejemplo conceptual:
+
+```text
+CLIENTE
+cliente_id = 9
+tecnico_id = null
+rol = CLIENTE
+```
+
+```text
+TECNICO
+cliente_id = null
+tecnico_id = 1
+rol = TECNICO
+```
+
+```text
+ADMINISTRADOR
+cliente_id = null
+tecnico_id = null
+rol = ADMINISTRADOR
+```
+
+Las contraseñas se almacenan mediante BCrypt.
+
+---
+
+# 1. Preparar la base de datos
+
+Abrir MySQL Workbench y ejecutar:
+
+```text
+database/setup.sql
+```
 
 ---
 
@@ -406,42 +1004,13 @@ $env:ADMIN_PASSWORD="TU_CONTRASEÑA_ADMIN"
 
 Las contraseñas y secretos reales no deben almacenarse directamente en el repositorio.
 
-## Crear usuarios y probar los roles
-
-Al iniciar, el backend crea el administrador inicial (`ADMIN_EMAIL` / `ADMIN_PASSWORD`). El rol `TECNICO` se crea desde la API, con la sesión del administrador:
-
-1. Iniciar sesión en `POST /api/auth/login`:
-
-```json
-{
-  "email": "admin@grzasociados.com",
-  "password": "TU_CONTRASEÑA_ADMIN"
-}
-```
-
-2. Copiar el `token` de la respuesta y usarlo en Swagger (botón **Authorize**) o como `Authorization: Bearer <token>`.
-
-3. Crear el técnico con `POST /api/usuarios`:
-
-```json
-{
-  "email": "tecnico@grzasociados.com",
-  "password": "Tecnico2026!",
-  "rol": "TECNICO"
-}
-```
-
-Con ese usuario se puede iniciar sesión en el frontend y comprobar que el técnico consulta solicitudes y cambia estados, pero no registra solicitudes ni cierra una solicitud resuelta.
-
-La colección de Postman (`efsrt2-soporte-tecnico-api/postman`) automatiza estos pasos en la carpeta **00 - Autenticación y usuarios (JWT)**: solo se debe definir la variable `adminPassword`.
-
 ## Ejecutar Spring Boot
 
 ```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
-El backend estará disponible en:
+Backend:
 
 ```text
 http://localhost:8080
@@ -451,6 +1020,12 @@ Swagger:
 
 ```text
 http://localhost:8080/swagger-ui/index.html
+```
+
+OpenAPI:
+
+```text
+http://localhost:8080/v3/api-docs
 ```
 
 ---
@@ -475,16 +1050,55 @@ Ejecutar:
 npm run dev
 ```
 
-Normalmente estará disponible en:
+Normalmente:
 
 ```text
 http://localhost:5173
 ```
 
-Si el puerto se encuentra ocupado, Vite puede iniciar en otro puerto, por ejemplo:
+Si el puerto está ocupado, Vite utilizará otro puerto disponible.
+
+---
+
+# Registro de una cuenta CLIENTE
+
+Desde la web:
 
 ```text
-http://localhost:5174
+Login
+   ↓
+Crear cuenta
+   ↓
+Nombre
+Correo
+Empresa
+Contraseña
+Confirmar contraseña
+   ↓
+Crear cuenta
+```
+
+También puede probarse mediante Swagger:
+
+```http
+POST /api/auth/registro
+```
+
+Ejemplo:
+
+```json
+{
+  "nombre": "Pedro Quispe",
+  "email": "pedro@empresa.com",
+  "empresa": "Empresa ABC",
+  "password": "Cliente123*"
+}
+```
+
+La cuenta creada tendrá automáticamente:
+
+```text
+rol = CLIENTE
 ```
 
 ---
@@ -496,14 +1110,14 @@ Para probar endpoints protegidos:
 ```text
 1. Abrir POST /api/auth/login.
 2. Ingresar correo y contraseña.
-3. Ejecutar la petición.
-4. Copiar únicamente el valor de "token".
+3. Ejecutar.
+4. Copiar el valor de "token".
 5. Pulsar "Authorize".
 6. Pegar el JWT.
 7. Ejecutar los endpoints protegidos.
 ```
 
-Swagger agrega automáticamente:
+Swagger enviará:
 
 ```http
 Authorization: Bearer <JWT>
@@ -519,7 +1133,7 @@ Las pruebas del backend pueden ejecutarse con:
 .\mvnw.cmd clean test
 ```
 
-Resultado verificado:
+Último resultado documentado:
 
 ```text
 Tests run: 11
@@ -530,7 +1144,7 @@ Skipped: 0
 BUILD SUCCESS
 ```
 
-La suite actualmente incluye:
+La suite incluye:
 
 ```text
 SoporteTecnicoApiApplicationTests
@@ -554,69 +1168,20 @@ Total:
 
 ---
 
-## Pruebas de disponibilidad
-
-`TecnicoDisponibleValidatorTest` verifica:
-
-```text
-Técnico disponible
-→ operación permitida
-
-Técnico no disponible
-→ ReglaNegocioException
-
-Solicitud sin técnico
-→ operación permitida
-```
-
----
-
-## Pruebas de transición de estados
-
-`TransicionEstadoValidatorTest` verifica:
-
-```text
-PENDIENTE → EN_PROCESO ✅
-EN_PROCESO → RESUELTA ✅
-RESUELTA → CERRADA ✅
-PENDIENTE → CERRADA ❌
-```
-
----
-
-## Pruebas de permisos
-
-`PermisoCambioEstadoValidatorTest` verifica:
-
-```text
-TÉCNICO
-RESUELTA → CERRADA
-→ bloqueado ✅
-
-ADMINISTRADOR
-RESUELTA → CERRADA
-→ permitido ✅
-
-TÉCNICO
-EN_PROCESO → RESUELTA
-→ permitido ✅
-```
-
----
-
 # Pruebas funcionales
 
-También se realizaron pruebas funcionales mediante:
+También se realizaron pruebas mediante:
 
 - Swagger UI.
 - Postman.
 - Frontend React.
 - Navegador web.
+- MySQL Workbench.
 
 Se comprobó el flujo:
 
 ```text
-ADMINISTRADOR
+CLIENTE / ADMINISTRADOR
 → registra solicitud
 → PENDIENTE
 
@@ -636,133 +1201,110 @@ ADMINISTRADOR
 También se verificaron:
 
 - Login correcto.
+- Registro público de clientes.
 - Generación de JWT.
 - Bearer Token.
 - Acceso por roles.
 - Restricción de endpoints administrativos.
+- Solicitudes exclusivas por cliente.
+- Solicitudes exclusivas por técnico.
+- Cálculo automático de fecha límite.
+- Registro automático de fechas.
 - Cierre de sesión.
-- Diferenciación visual por roles.
+- Vistas diferenciadas por rol.
 - Manejo de errores.
-- Validaciones.
-- Persistencia de solicitudes.
+- Persistencia en MySQL.
 
 ---
 
-# Vista del administrador
+# Principios SOLID
 
-El administrador visualiza:
+Durante el desarrollo se aplicaron principios SOLID y separación de responsabilidades.
 
-```text
-Sistema de Soporte Técnico
-Gestión y seguimiento de solicitudes de soporte
+## SRP - Responsabilidad única
 
-Registrar nueva solicitud
-
-Solicitudes registradas
-```
-
-Puede crear solicitudes y realizar las acciones administrativas correspondientes.
-
----
-
-# Vista del técnico
-
-El técnico visualiza:
+Ejemplos:
 
 ```text
-Sistema de Soporte Técnico
-Solicitudes asignadas y seguimiento técnico
+SolicitudForm
+→ formulario del administrador
 
-Solicitudes de soporte
+ClienteSolicitudForm
+→ formulario del cliente
+
+SolicitudDetalleModal
+→ visualización del detalle
+
+FechaLimiteService
+→ cálculo de fecha límite
+
+TecnicoSolicitudService
+→ operaciones del técnico
+
+ClienteSolicitudService
+→ operaciones del cliente
 ```
 
-No visualiza el formulario para registrar solicitudes.
+## OCP - Abierto/Cerrado
 
-Según el estado puede visualizar acciones como:
+Se pueden agregar nuevos servicios, validadores o métodos sin reescribir la lógica completa.
+
+Ejemplo:
 
 ```text
-PENDIENTE
-→ Iniciar atención
-
-EN_PROCESO
-→ Marcar resuelta
-
-RESUELTA
-→ Pendiente de cierre
-
-CERRADA
-→ Finalizada
+apiClient
+GET
+POST
+PUT
+PATCH
 ```
 
----
+## ISP - Segregación de interfaces
 
-# Principios de diseño
-
-Durante el desarrollo se aplicaron separación de responsabilidades y principios SOLID.
-
-Se utilizaron componentes independientes como:
-
-- Controllers.
-- Application Services.
-- Services.
-- Validators.
-- Repositories.
-- DTO.
-- Mapper.
-- Componentes React.
-- Servicios frontend.
-- SecurityConfig.
-- JwtService.
-- UsuarioDetailsService.
-
-Un ejemplo de separación de responsabilidades es:
+Los servicios se separan según responsabilidad y rol.
 
 ```text
-TecnicoDisponibleValidator
-→ valida disponibilidad
-
-TransicionEstadoValidator
-→ valida el flujo de estados
-
-PermisoCambioEstadoValidator
-→ valida permisos del usuario
+SolicitudService
+TecnicoSolicitudService
+ClienteSolicitudService
+RegistroClienteService
 ```
 
-De esta manera, al incorporar una nueva regla no es necesario modificar toda la lógica existente.
+## DIP - Inversión de dependencias
 
-Esto reduce el acoplamiento y facilita el mantenimiento y ampliación del sistema.
+Las clases reciben sus dependencias mediante constructor y Spring administra las implementaciones.
 
 ---
 
 # Integración completa
 
-El flujo general del sistema es:
+El flujo general es:
 
 ```text
 Usuario
    ↓
 React + TypeScript
    ↓
-Login / JWT
+Login / Registro / JWT
    ↓
 API REST Spring Boot
    ↓
 Spring Security
    ↓
-Application Service
+Controllers
    ↓
-Lógica de negocio
+Application Services / Services
    ↓
 Validators
    ↓
-Repository
+Repositories
    ↓
 JPA / Hibernate
    ↓
 MySQL
 ```
 
-El proyecto integra correctamente las tres capas principales solicitadas:
+El proyecto integra las tres capas principales solicitadas:
 
 ```text
 Vista
@@ -791,6 +1333,8 @@ Incluye:
 database/
 efsrt2-soporte-tecnico-api/
 efsrt2-soporte-tecnico-web/
+docs/
+README.md
 ```
 
 ---
@@ -814,13 +1358,26 @@ Actualmente se encuentra implementado:
 - Spring Security.
 - JWT.
 - BCrypt.
-- Roles `ADMINISTRADOR` y `TECNICO`.
+- Roles `ADMINISTRADOR`, `TECNICO` y `CLIENTE`.
+- Registro público de clientes.
 - Control de acceso según rol.
 - Login y cierre de sesión.
 - Vistas diferenciadas según rol.
-- Flujo de estados.
+- Solicitudes propias del cliente.
+- Solicitudes asignadas al técnico.
+- Flujo completo de estados.
+- Gravedad de incidencias.
+- Fecha límite automática.
+- Fecha de creación.
+- Fecha de inicio de atención.
+- Fecha de solución.
+- Fecha de cierre.
+- Ver detalle del ticket.
+- Administración de clientes.
+- Activación y desactivación de cuentas.
+- Restablecimiento de contraseñas.
 - Validación de permisos.
-- 11 pruebas automatizadas.
+- 11 pruebas automatizadas documentadas.
 - Pruebas funcionales de integración.
 
-El sistema cuenta con una base funcional, modular y segura que puede continuar ampliándose mediante nuevos módulos sin modificar innecesariamente los componentes existentes.
+El sistema cuenta con una base funcional, modular y segura que puede continuar ampliándose mediante nuevos módulos, dashboards, reportes, métricas y funcionalidades de administración sin modificar innecesariamente los componentes existentes.
